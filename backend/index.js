@@ -13,7 +13,7 @@ app.use(
     origin: "http://localhost:3000", // React app's URL
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"],
-  })
+  }),
 );
 app.use(bodyParser.json());
 
