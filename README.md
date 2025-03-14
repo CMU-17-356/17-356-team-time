@@ -63,8 +63,7 @@ docker-compose logs -f
 
 
 #### 2. Code Architecture & Design  
-- Does the code follow existing patterns and conventions?  
-- Is there proper separation of Model, View, Controller?  
+- Does the code follow existing patterns and conventions? 
 - Does the code introduce unnecessary dependencies?  
 - Are modules, classes, and functions reusable? 
 
