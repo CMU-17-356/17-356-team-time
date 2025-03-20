@@ -10,24 +10,20 @@ export interface User {
 }
 
 /**
- * Profile model - contains researcher-specific information
+ * Profile model - extends User since it contains duplicate information
  */
-export interface Profile {
+export interface Profile extends User {
   profileId: string; // Primary key
-  userId: string; // Foreign key to User table
-  firstName: string;
-  lastName: string;
-  email: string;
+  createdAt: string;
+  updatedAt?: string;
   phone?: string; // Optional
   institution?: string; // Optional
   fieldOfInterest?: string; // Optional
   bio?: string; // Optional
-  createdAt: string;
-  updatedAt?: string;
 }
 
 // Table names as constants for easier referencing
-export const TableNames = {
-  USERS: "Users",
-  PROFILES: "Profiles",
-};
+export enum TableNames {
+  USERS = "Users",
+  PROFILES = "Profiles",
+}
