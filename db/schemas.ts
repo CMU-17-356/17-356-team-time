@@ -6,14 +6,14 @@ export interface User {
   firstName: string;
   lastName: string;
   email: string;
-  createdAt: string;
+  // createdAt: string;
 }
 
 /**
  * Profile model - extends User since it contains duplicate information
  */
 export interface Profile extends User {
-  profileId: string; // Primary key
+  // profileId: string; // Primary key
   createdAt: string;
   updatedAt?: string;
   phone?: string; // Optional
