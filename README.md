@@ -55,6 +55,12 @@ _For troubleshooting, check the logs using:_
 docker-compose logs -f
 ```
 
+## Developer Guide
+
+### Conventional Commits
+
+Please abide by the guidelines outlined through: https://www.conventionalcommits.org/en/v1.0.0/
+
 ## Code Review Guidelines
 
 ### High Level Guidelines
