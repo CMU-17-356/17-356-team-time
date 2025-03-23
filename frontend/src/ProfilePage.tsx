@@ -15,11 +15,11 @@ import {
 // Types
 export interface Researcher {
   name: string;
-  profilePicture: string;
-  affiliation: string;
-  following: number;
-  followers: number;
-  socials: SocialLinks;
+  profilePicture: string; // todo
+  affiliation: string; 
+  following: number; // todo
+  followers: number; // todo
+  socials: SocialLinks; // todo
   bio: string;
   researchInterests: string[];
 }
