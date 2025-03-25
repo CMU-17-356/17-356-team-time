@@ -1,22 +1,22 @@
 import axios from "axios";
 import {
-  Camera,
-  Check,
-  Github,
-  Globe,
-  Linkedin,
-  MoreVertical,
-  Pencil,
-  Trash2,
-  Twitter,
-  Upload,
-  UserPlus,
-  X,
+    Camera,
+    Check,
+    Github,
+    Globe,
+    Linkedin,
+    MoreVertical,
+    Pencil,
+    Trash2,
+    Twitter,
+    Upload,
+    UserPlus,
+    X,
 } from "lucide-react";
 import React, { useRef, useState } from "react";
 import { ProfileInterests } from "./ProfileInterests";
-import { API_ENDPOINT } from "./consts";
-import { Profile, ProfileHeaderProps } from "./types";
+import { API_ENDPOINT } from "../consts";
+import { Profile, ProfileHeaderProps } from "../types";
 
 
 export const ProfileHeader = (props: ProfileHeaderProps) => {
@@ -82,6 +82,8 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
     axios.put(`${API_ENDPOINT}/${props.userId}`, researcherExpr)
     .then((response) => {
       props.setResearcher({...researcherExpr, ...response.data});
+      setIsEditing(false);
+      window.location.reload();
     })
     .catch((error: any) => {
       console.log(error);
@@ -106,6 +108,7 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
     axios.delete(`${API_ENDPOINT}/${props.userId}`)
     .then(() => {
       alert("Profile deleted successfully!");
+      window.open("/");
     })
     .catch((error: any) => {
       console.log(error);

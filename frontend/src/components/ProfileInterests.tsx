@@ -21,10 +21,10 @@ export const ProfileInterests = (props: ResearchInterestProps) => {
   const handleInterestsSubmit = () => {
     if (interestsInput.trim()) {
       // Parse comma-separated values, trim whitespace, and filter out empty strings
-      const newInterests = interestsInput
+      const newInterests = tempInterests.split(",").concat(interestsInput
         .split(",")
         .map((i) => i.trim())
-        .filter((i) => i !== "")
+        .filter((i) => i !== ""))
         .join(",");
 
       setTempInterests(newInterests);
@@ -35,7 +35,7 @@ export const ProfileInterests = (props: ResearchInterestProps) => {
 
   // Remove an interest tag
   const removeInterest = (index: number) => {
-    const updatedInterests = [...tempInterests];
+    const updatedInterests = [...tempInterests.split(",")];
     updatedInterests.splice(index, 1);
     setTempInterests(updatedInterests.join(","));
   };

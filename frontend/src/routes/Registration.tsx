@@ -1,10 +1,11 @@
 // tailwind docs: https://v2.tailwindcss.com/docs/
-import React, { useState } from "react";
 import axios from "axios";
-
-const API_BASE_URL = "http://localhost:5001/api/profiles";
+import React, { useState } from "react";
+import { useNavigate } from "react-router";
+import { API_ENDPOINT } from "../consts";
 
 const UserRegistration: React.FC = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         profileId: "",
         userId: "",
@@ -30,7 +31,7 @@ const UserRegistration: React.FC = () => {
         return;
         }
         try {
-            const res = await axios.post(API_BASE_URL, {
+            const res = await axios.post(API_ENDPOINT, {
                 profileId:formData.userId,
                 userId: formData.userId,
                 firstName: formData.firstName,
@@ -44,6 +45,7 @@ const UserRegistration: React.FC = () => {
 
         alert("Registration Successful!");
         console.log("User Created:", res.data);
+        navigate(`/profile/${formData.userId}`, {replace: true});
         } catch (error) {
             console.error("Error registering user:", error);
             alert("Registration failed. Try again.");

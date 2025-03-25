@@ -1,15 +1,15 @@
 import {
-  ExternalLink,
-  Heart,
-  MessageSquare,
-  Repeat2,
-  Share2,
+    ExternalLink,
+    Heart,
+    MessageSquare,
+    Repeat2,
+    Share2,
 } from "lucide-react";
 import { useState } from "react";
+import { ProfileHeaderProps, Researcher } from "../types";
 import {
-  ProfileHeader,
+    ProfileHeader,
 } from "./ProfileHeader";
-import { ProfileHeaderProps, Researcher } from "./types";
 
 interface Post {
   id: string;
