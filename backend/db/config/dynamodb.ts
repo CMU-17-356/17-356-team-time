@@ -2,7 +2,7 @@ import { DynamoDB } from "aws-sdk";
 import dotenv from "dotenv";
 
 // Load environment variables
-dotenv.config();
+dotenv.config({path: "../env"});
 
 // Configure AWS SDK
 const dynamoDB = new DynamoDB.DocumentClient({

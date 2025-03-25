@@ -8,6 +8,8 @@ services:
       - "5001:5001"
     environment:
       - NODE_ENV=production
+    volumes:
+    - ./backend/db/.env:/app/db/.env:ro
 
   frontend:
     build:
