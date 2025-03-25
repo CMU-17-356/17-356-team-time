@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { BrowserRouter, Route, Routes } from "react-router";
+import { BrowserRouter, Outlet, Route, Routes } from "react-router";
 import { ProfilePage } from "./ProfilePage";
 import { API_ENDPOINT } from "./consts";
 import { Home } from "./routes/Home";
@@ -37,7 +37,7 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Home profiles={profiles}/>} key="route-base">
+          <Route path="/" element={<Outlet />} key="route-base">
             <Route index element={<Home profiles={profiles}/>} key="route-index" />
             <Route path="/profile/:profileId" element={<ProfilePage profiles={profiles}/>} key={`route-profile`} />
           </Route>

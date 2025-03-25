@@ -116,7 +116,7 @@ router.delete("/:profileId", (async (req, res) => {
     res.status(204).send();
   } catch (error) {
     console.error("Error deleting profile:", error);
-    res.status(500).json({ error: "Could not delete profile" });
+    res.status(500).json({ error: "Could not delete profile" + error });
   }
 }) as RequestHandler);
 
