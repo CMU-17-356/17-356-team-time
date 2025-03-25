@@ -79,7 +79,7 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
       bio: tempBio,
       fieldOfInterest: tempInterests,
     }
-    axios.put(`${API_ENDPOINT}/${props.profileId}`, researcherExpr)
+    axios.put(`${API_ENDPOINT}/${props.userId}`, researcherExpr)
     .then((response) => {
       props.setResearcher({...researcherExpr, ...response.data});
     })
@@ -103,7 +103,7 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
   // Delete profile
   const handleDeleteProfile = () => {
     // TODO: make an API call to delete the profile
-    axios.delete(`${API_ENDPOINT}/${props.profileId}`)
+    axios.delete(`${API_ENDPOINT}/${props.userId}`)
     .then(() => {
       alert("Profile deleted successfully!");
     })

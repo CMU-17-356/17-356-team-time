@@ -5,8 +5,8 @@ import { API_ENDPOINT } from "../consts";
 export async function clientLoader({
   params,
 }: any) {
-  console.log("trying to fetch researcher with id: ", params.profileId);
-  await axios.get(`${API_ENDPOINT}/${params.profileId}`).then((response) => {
+  console.log("trying to fetch researcher with id: ", params.userId);
+  await axios.get(`${API_ENDPOINT}/${params.userId}`).then((response) => {
     return response;
   }).catch((error) => {
     console.log(error);

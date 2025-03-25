@@ -2,7 +2,7 @@
  * The basic User model
  */
 export interface User {
-  userId: string;
+  userId: string; // Primary key
   firstName: string;
   lastName: string;
   email: string;
@@ -12,7 +12,6 @@ export interface User {
  * Profile model - extends User since it contains duplicate information
  */
 export interface Profile extends User {
-  profileId: string; // Primary key
   phone?: string; // Optional
   institution?: string; // Optional
   fieldOfInterest?: string; // Optional

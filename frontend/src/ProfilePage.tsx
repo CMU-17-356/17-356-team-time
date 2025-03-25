@@ -7,20 +7,20 @@ import { Researcher } from "./types";
 export const ProfilePage = (props: {profiles: Researcher[]}) => {
   if (props.profiles.length > 0) {
     const [researcher, setResearcher] = useState<Researcher| null>();
-    const { profileId } = useParams<{ profileId: string }>();
+    const { userId } = useParams<{ userId: string }>();
     // useEffect(() => {
-    //   console.log("trying to fetch researcher with id: ", profileId);
-    //   axios.get(`${API_ENDPOINT}/${profileId}`).then((response) => {
+    //   console.log("trying to fetch researcher with id: ", userId);
+    //   axios.get(`${API_ENDPOINT}/${userId}`).then((response) => {
     //     setResearcher({...researcher, ...response.data});
     //   }).catch((error) => {
     //     console.log(error);
     //   });
-    // }, [profileId]);
+    // }, [userId]);
   
-    console.log("profileId", researcher);
+    console.log("userId", researcher);
   
-    if (profileId !== researcher?.profileId) {
-      setResearcher({...defaultResearcher, ...props.profiles.find(p => p.profileId === profileId)});
+    if (userId !== researcher?.userId) {
+      setResearcher({...defaultResearcher, ...props.profiles.find(p => p.userId === userId)});
     }
   
     return researcher ? <ResearcherProfile {...researcher} />

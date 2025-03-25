@@ -22,8 +22,8 @@ function App() {
   }, []);
 
   // useEffect(() => {
-  //   console.log("trying to fetch researcher with id: ", defaultResearcher.profileId);
-  //   axios.get(`${API_ENDPOINT}/${defaultResearcher.profileId}`).then((response) => {
+  //   console.log("trying to fetch researcher with id: ", defaultResearcher.userId);
+  //   axios.get(`${API_ENDPOINT}/${defaultResearcher.userId}`).then((response) => {
   //     // setResearcher({...researcher, ...response.data});
   //     console.log("fetched researcher: ", response.data)
   //   }).catch((error) => {
@@ -39,7 +39,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Outlet />} key="route-base">
             <Route index element={<Home profiles={profiles}/>} key="route-index" />
-            <Route path="/profile/:profileId" element={<ProfilePage profiles={profiles}/>} key={`route-profile`} />
+            <Route path="/profile/:userId" element={<ProfilePage profiles={profiles}/>} key={`route-profile`} />
           </Route>
         </Routes>
       </BrowserRouter>

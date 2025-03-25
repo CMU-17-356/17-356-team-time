@@ -21,7 +21,7 @@ app.use("/api/profiles", profileRouter);
 
 describe("Profile Routes", () => {
   const mockProfile = {
-    profileId: uuidv4(),
+    profileId: "",
     userId: uuidv4(),
     firstName: "John",
     lastName: "Doe",
@@ -42,14 +42,14 @@ describe("Profile Routes", () => {
         promise: jest.fn().mockResolvedValue({}),
       });
 
-      const { profileId, createdAt, updatedAt, ...profileData } = mockProfile;
+      const { userId, createdAt, updatedAt, ...profileData } = mockProfile;
       const response = await request(app)
         .post("/api/profiles")
         .send(profileData);
 
       expect(response.status).toBe(201);
       expect(response.body).toMatchObject(profileData);
-      expect(response.body.profileId).toBeDefined();
+      expect(response.body.userId).toBeDefined();
       expect(response.body.createdAt).toBeDefined();
       expect(response.body.updatedAt).toBeDefined();
       expect(dynamoDB.put).toHaveBeenCalledWith({
@@ -72,21 +72,21 @@ describe("Profile Routes", () => {
     });
   });
 
-  describe("GET /api/profiles/:profileId", () => {
+  describe("GET /api/profiles/:userId", () => {
     it("should get a profile by ID", async () => {
       (dynamoDB.get as jest.Mock).mockReturnValue({
         promise: jest.fn().mockResolvedValue({ Item: mockProfile }),
       });
 
       const response = await request(app).get(
-        `/api/profiles/${mockProfile.profileId}`,
+        `/api/profiles/${mockProfile.userId}`,
       );
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual(mockProfile);
       expect(dynamoDB.get).toHaveBeenCalledWith({
         TableName: "Profiles",
-        Key: { profileId: mockProfile.profileId },
+        Key: { userId: mockProfile.userId },
       });
     });
 
@@ -96,7 +96,7 @@ describe("Profile Routes", () => {
       });
 
       const response = await request(app).get(
-        `/api/profiles/${mockProfile.profileId}`,
+        `/api/profiles/${mockProfile.userId}`,
       );
 
       expect(response.status).toBe(404);
@@ -104,7 +104,7 @@ describe("Profile Routes", () => {
     });
   });
 
-  describe("PUT /api/profiles/:profileId", () => {
+  describe("PUT /api/profiles/:userId", () => {
     it("should update a profile", async () => {
       const updateData = { firstName: "Jane" };
       (dynamoDB.update as jest.Mock).mockReturnValue({
@@ -114,7 +114,7 @@ describe("Profile Routes", () => {
       });
 
       const response = await request(app)
-        .put(`/api/profiles/${mockProfile.profileId}`)
+        .put(`/api/profiles/${mockProfile.userId}`)
         .send(updateData);
 
       expect(response.status).toBe(200);
@@ -122,26 +122,26 @@ describe("Profile Routes", () => {
       expect(dynamoDB.update).toHaveBeenCalledWith(
         expect.objectContaining({
           TableName: "Profiles",
-          Key: { profileId: mockProfile.profileId },
+          Key: { userId: mockProfile.userId },
         }),
       );
     });
   });
 
-  describe("DELETE /api/profiles/:profileId", () => {
+  describe("DELETE /api/profiles/:userId", () => {
     it("should delete a profile", async () => {
       (dynamoDB.delete as jest.Mock).mockReturnValue({
         promise: jest.fn().mockResolvedValue({}),
       });
 
       const response = await request(app).delete(
-        `/api/profiles/${mockProfile.profileId}`,
+        `/api/profiles/${mockProfile.userId}`,
       );
 
       expect(response.status).toBe(204);
       expect(dynamoDB.delete).toHaveBeenCalledWith({
         TableName: "Profiles",
-        Key: { profileId: mockProfile.profileId },
+        Key: { userId: mockProfile.userId },
       });
     });
   });

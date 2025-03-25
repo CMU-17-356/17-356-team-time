@@ -8,8 +8,8 @@ export const Home = (props: {profiles: Researcher[]}) => {
   const [researcher, setResearcher] = useState(emptyResearcher);
 
   const createProfile = () => {
-    if (researcher.profileId === "nouser") {
-      console.log("trying to create researcher with id: ", defaultResearcher.profileId);
+    if (researcher.userId === "nouser") {
+      console.log("trying to create researcher with id: ", defaultResearcher.userId);
       axios.post(API_ENDPOINT, defaultResearcher)
       .then((response) => {
         setResearcher({...defaultResearcher, ...response.data});
@@ -26,7 +26,7 @@ export const Home = (props: {profiles: Researcher[]}) => {
   return <div className="w-full h-full bg-indigo-900 flex flex-row justify-center items-center">
   <div className="w-10 h-10 rounded-lg bg-blue-500" onClick={createProfile}>Make</div>
   <div>
-    {props.profiles.map(p => <NavLink to={`profile/${p.profileId}`} className="bg-red-500 text-white h-10 w-20 rounded-lg block">{p.profileId}</NavLink>)}
+    {props.profiles.map(p => <NavLink to={`profile/${p.userId}`} className="bg-red-500 text-white h-10 w-20 rounded-lg block">{p.userId}</NavLink>)}
   </div>
   </div>
 }
