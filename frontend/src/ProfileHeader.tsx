@@ -14,18 +14,9 @@ import {
   X,
 } from "lucide-react";
 import React, { useRef, useState } from "react";
-import { Researcher } from "./ProfilePage";
+import { ProfileInterests } from "./ProfileInterests";
+import { ProfileHeaderProps, Researcher } from "./types";
 
-export interface SocialLinks {
-  twitter?: string;
-  github?: string;
-  linkedin?: string;
-  website?: string;
-}
-export interface ProfileHeaderProps extends Researcher {
-  setResearcher: (researcher: Researcher) => void;
-  isFollowing: boolean;
-}
 
 export const ProfileHeader = (props: ProfileHeaderProps) => {
   const [showMenu, setShowMenu] = useState(false);
@@ -35,10 +26,7 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
   const [isFollowing, setisFollowing] = useState(props.isFollowing);
   const [isEditing, setIsEditing] = useState(false);
   const [tempBio, setTempBio] = useState(props.bio);
-  const [tempInterests, setTempInterests] = useState(
-    props.fieldOfInterest || []
-  );
-  const [interestsInput, setInterestsInput] = useState("");
+  const [tempInterests, setTempInterests] = useState(props.fieldOfInterest || "");
 
   // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -70,31 +58,7 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
     setTempBio(e.target.value);
   };
 
-  // Handle interests input change
-  const handleInterestsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInterestsInput(e.target.value);
-  };
 
-  // Handle interests submission
-  const handleInterestsSubmit = () => {
-    if (interestsInput.trim()) {
-      // Parse comma-separated values, trim whitespace, and filter out empty strings
-      const newInterests = interestsInput
-        .split(",")
-        .map((i) => i.replace(",", "").trim())
-        .filter((i) => i !== "");
-
-      setTempInterests([...newInterests]);
-      setInterestsInput("");
-    }
-  };
-
-  // Remove an interest tag
-  const removeInterest = (index: number) => {
-    const updatedInterests = [...tempInterests];
-    updatedInterests.splice(index, 1);
-    setTempInterests(updatedInterests);
-  };
 
   // Handle form changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -116,7 +80,7 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
       fieldOfInterest: tempInterests,
     }
     props.setResearcher(researcherExpr);
-    axios.post(`http://localhost:5001/api/profiles/${props.userId}`, researcherExpr)
+    axios.post(`http://localhost:5001/api/profiles/${props.profileId}`, researcherExpr)
     .then((response: { data: { result: Researcher; }; }) => {
       props.setResearcher(response.data.result);
     })
@@ -134,14 +98,14 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
       lastName: props.lastName,
       affiliation: props.institution,
     });
-    setTempInterests(props.fieldOfInterest || []);
+    setTempInterests(props.fieldOfInterest || "");
     setIsEditing(false);
   };
 
   // Delete profile
   const handleDeleteProfile = () => {
     // TODO: make an API call to delete the profile
-    axios.delete(`http://localhost:5001/api/profiles/${props.userId}`)
+    axios.delete(`http://localhost:5001/api/profiles/${props.profileId}`)
     .then(() => {
       alert("Profile deleted successfully!");
     })
@@ -184,8 +148,7 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
   // Update tempBio and tempInterests when researcher data changes or edit mode is entered
   React.useEffect(() => {
     setTempBio(props.bio);
-    setTempInterests(props.fieldOfInterest || []);
-  }, [props.bio, props.fieldOfInterest, isEditing]);
+  }, [props.bio, isEditing]);
 
   return (
     <div>
@@ -399,81 +362,7 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
           </div>
         </div>
 
-        {/* Research Interests Section */}
-        <div className="mt-4 mb-2">
-          {isEditing ? (
-            <div className="space-y-3">
-              <label className="block text-sm font-medium text-gray-700">
-                Research Interests
-              </label>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {tempInterests.map((interest, index) => (
-                  <span
-                    key={index}
-                    className="inline-flex items-center bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded"
-                  >
-                    {interest}
-                    <button
-                      onClick={() => removeInterest(index)}
-                      className="ml-1 text-blue-500 hover:text-blue-700"
-                    >
-                      <X size={14} />
-                    </button>
-                  </span>
-                ))}
-              </div>
-              <div className="flex">
-                <input
-                  type="text"
-                  value={interestsInput}
-                  onChange={handleInterestsChange}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      handleInterestsSubmit();
-                    }
-                  }}
-                  placeholder="Add interests (comma-separated)"
-                  className="flex-1 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                />
-                <button
-                  onClick={handleInterestsSubmit}
-                  className="ml-2 px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                >
-                  Add
-                </button>
-              </div>
-              <p className="text-xs text-gray-500">
-                Enter keywords separated by commas to add multiple interests at
-                once.
-              </p>
-            </div>
-          ) : (
-            <div className="mt-3 mb-3">
-              <h4 className="text-sm font-medium text-gray-700 mb-1">
-                Research Interests
-              </h4>
-              <div className="flex flex-wrap gap-1">
-                {props.fieldOfInterest &&
-                props.fieldOfInterest.length > 0 ? (
-                  props.fieldOfInterest.map((interest, index) => (
-                    <span
-                      key={index}
-                      className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded"
-                    >
-                      {interest}
-                      {index < props.fieldOfInterest.length - 1 && ","}
-                    </span>
-                  ))
-                ) : (
-                  <span className="text-xs text-gray-500 italic">
-                    No research interests specified.
-                  </span>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
+       <ProfileInterests {...{fieldOfInterest: tempInterests, isEditing, onSubmit: setTempInterests}}/>
 
         {/* Bio Section */}
         <div className="border-t-2 border-slate-200 pt-2">
