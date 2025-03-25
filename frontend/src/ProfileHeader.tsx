@@ -1,3 +1,4 @@
+import axios from "axios";
 import {
   Camera,
   Check,
@@ -35,7 +36,7 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [tempBio, setTempBio] = useState(props.bio);
   const [tempInterests, setTempInterests] = useState(
-    props.researchInterests || []
+    props.fieldOfInterest || []
   );
   const [interestsInput, setInterestsInput] = useState("");
 
@@ -59,8 +60,9 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
 
   // Form data
   const [editFormData, setEditFormData] = useState({
-    name: props.name,
-    affiliation: props.affiliation,
+    firstName: props.firstName,
+    lastName: props.lastName,
+    affiliation: props.institution,
   });
 
   // Handle bio change
@@ -105,12 +107,22 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
 
   // Save changes
   const handleSaveChanges = () => {
-    props.setResearcher({
+    const researcherExpr: Researcher = {
       ...props,
-      name: editFormData.name,
-      affiliation: editFormData.affiliation,
+      firstName: editFormData.firstName,
+      lastName: editFormData.lastName,
+      institution: editFormData.affiliation,
       bio: tempBio,
-      researchInterests: tempInterests,
+      fieldOfInterest: tempInterests,
+    }
+    props.setResearcher(researcherExpr);
+    axios.post(`http://localhost:5001/api/profiles/${props.userId}`, researcherExpr)
+    .then((response: { data: { result: Researcher; }; }) => {
+      props.setResearcher(response.data.result);
+    })
+    .catch((error: any) => {
+      console.log(error);
+      alert("Error fetching researcher");
     });
     setIsEditing(false);
   };
@@ -118,22 +130,31 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
   // Cancel editing
   const handleCancelEdit = () => {
     setEditFormData({
-      name: props.name,
-      affiliation: props.affiliation,
+      firstName: props.firstName,
+      lastName: props.lastName,
+      affiliation: props.institution,
     });
-    setTempInterests(props.researchInterests || []);
+    setTempInterests(props.fieldOfInterest || []);
     setIsEditing(false);
   };
 
   // Delete profile
   const handleDeleteProfile = () => {
     // TODO: make an API call to delete the profile
-    alert("Profile deleted successfully!");
+    axios.delete(`http://localhost:5001/api/profiles/${props.userId}`)
+    .then(() => {
+      alert("Profile deleted successfully!");
+    })
+    .catch((error: any) => {
+      console.log(error);
+      alert("Error deleting researcher");
+    });
     setShowDeleteConfirm(false);
   };
 
   // Toggle follow state
   const toggleFollow = () => {
+    // TODO: push follow changes to server
     setisFollowing(!isFollowing);
     props.setResearcher({
       ...props,
@@ -163,8 +184,8 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
   // Update tempBio and tempInterests when researcher data changes or edit mode is entered
   React.useEffect(() => {
     setTempBio(props.bio);
-    setTempInterests(props.researchInterests || []);
-  }, [props.bio, props.researchInterests, isEditing]);
+    setTempInterests(props.fieldOfInterest || []);
+  }, [props.bio, props.fieldOfInterest, isEditing]);
 
   return (
     <div>
@@ -181,7 +202,7 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
             >
               <img
                 src={props.profilePicture}
-                alt={`${props.name}'s profile`}
+                alt={`${props.firstName} ${props.lastName}'s profile`}
                 className="w-full h-full object-cover"
               />
               {isEditing && profileHover && (
@@ -201,13 +222,29 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
                     htmlFor="name"
                     className="block text-sm font-medium text-gray-700"
                   >
-                    Name
+                    First name
                   </label>
                   <input
                     type="text"
-                    id="name"
-                    name="name"
-                    value={editFormData.name}
+                    id="firstName"
+                    name="firstName"
+                    value={editFormData.firstName}
+                    onChange={handleInputChange}
+                    className="mt-1 p-2 block w-full border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Last name
+                  </label>
+                  <input
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    value={editFormData.lastName}
                     onChange={handleInputChange}
                     className="mt-1 p-2 block w-full border border-gray-300 rounded-md"
                   />
@@ -247,8 +284,8 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
               <>
                 <div className="flex justify-between items-start">
                   <div>
-                    <h2 className="text-2xl font-bold">{props.name}</h2>
-                    <p className="text-gray-600">{props.affiliation}</p>
+                    <h2 className="text-2xl font-bold">{`${props.firstName} ${props.lastName}`}</h2>
+                    <p className="text-gray-600">{props.institution}</p>
 
                     {/* Follow Stats */}
                     <div className="mt-2 flex space-x-4 text-sm">
@@ -417,15 +454,15 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
                 Research Interests
               </h4>
               <div className="flex flex-wrap gap-1">
-                {props.researchInterests &&
-                props.researchInterests.length > 0 ? (
-                  props.researchInterests.map((interest, index) => (
+                {props.fieldOfInterest &&
+                props.fieldOfInterest.length > 0 ? (
+                  props.fieldOfInterest.map((interest, index) => (
                     <span
                       key={index}
                       className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded"
                     >
                       {interest}
-                      {index < props.researchInterests.length - 1 && ","}
+                      {index < props.fieldOfInterest.length - 1 && ","}
                     </span>
                   ))
                 ) : (

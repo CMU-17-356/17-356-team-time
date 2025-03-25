@@ -5,7 +5,7 @@ import {
   Repeat2,
   Share2,
 } from "lucide-react";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   ProfileHeader,
   ProfileHeaderProps,
@@ -14,14 +14,18 @@ import {
 
 // Types
 export interface Researcher {
-  name: string;
+  userId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  createdAt: string;
   profilePicture: string; // todo
-  affiliation: string; 
+  institution: string; 
   following: number; // todo
   followers: number; // todo
   socials: SocialLinks; // todo
   bio: string;
-  researchInterests: string[];
+  fieldOfInterest: string[];
 }
 
 interface Post {
@@ -42,26 +46,8 @@ interface Post {
   }>;
 }
 
-const ResearcherProfile: React.FC = () => {
-  const [researcher, setResearcher] = useState<Researcher>({
-    name: "Dr. Jane Smith",
-    affiliation: "Quantum Computing Lab, MIT",
-    profilePicture: "/api/placeholder/200/200",
-    following: 245,
-    followers: 1893,
-    socials: {
-      twitter: "https://twitter.com/janesmith",
-      github: "https://github.com/janesmith",
-      linkedin: "https://linkedin.com/in/janesmith",
-      website: "https://janesmith.research.mit.edu",
-    } as SocialLinks,
-    bio: "Professor of Quantum Computing at MIT with over 15 years of research experience. My work focuses on quantum entanglement, quantum algorithms, and applications in computational chemistry. I lead a team of researchers exploring the boundaries of quantum information science.",
-    researchInterests: [
-      "Quantum Computing",
-      "Quantum Entanglement",
-      "Quantum Algorithms",
-    ],
-  });
+const ResearcherProfile = (props: Researcher) => {
+  const [researcher, setResearcher] = useState<Researcher>(props);
   // Sample posts
   const [posts, setPosts] = useState<Post[]>([
     {
