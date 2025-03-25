@@ -31,7 +31,7 @@ router.post("/", (async (req, res) => {
     res.status(201).json(profile);
   } catch (error) {
     console.error("Error creating profile:", error);
-    res.status(500).json({ error: "Could not create profile" });
+    res.status(500).json({ error: "Could not create profile: " + error });
   }
 }) as RequestHandler);
 
