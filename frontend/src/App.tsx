@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Route, Routes } from "react-router";
+import { BrowserRouter, Route, Routes } from "react-router";
 import { SocialLinks } from "./ProfileHeader";
 import ResearcherProfile, { Researcher } from "./ProfilePage";
 import profileImg from "./assets/profile.jpg";
@@ -79,7 +79,7 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<BaseContent />} key="route-base">
+          <Route path="/" element={<div>Base Content</div>} key="route-base">
             <Route index element={<div>Home</div>} key="route-home" />
             {profiles.map((p) => (
               <Route
