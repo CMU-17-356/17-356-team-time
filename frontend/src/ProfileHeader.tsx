@@ -16,7 +16,7 @@ import {
 import React, { useRef, useState } from "react";
 import { ProfileInterests } from "./ProfileInterests";
 import { API_ENDPOINT } from "./consts";
-import { ProfileHeaderProps, Researcher } from "./types";
+import { Profile, ProfileHeaderProps } from "./types";
 
 
 export const ProfileHeader = (props: ProfileHeaderProps) => {
@@ -72,21 +72,19 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
 
   // Save changes
   const handleSaveChanges = () => {
-    const researcherExpr: Researcher = {
-      ...props,
+    const researcherExpr: Partial<Profile> = {
       firstName: editFormData.firstName,
       lastName: editFormData.lastName,
       institution: editFormData.affiliation,
       bio: tempBio,
       fieldOfInterest: tempInterests,
     }
-    axios.post(`${API_ENDPOINT}/${props.profileId}`, researcherExpr)
+    axios.put(`${API_ENDPOINT}/${props.profileId}`, researcherExpr)
     .then((response) => {
       props.setResearcher({...researcherExpr, ...response.data});
     })
     .catch((error: any) => {
       console.log(error);
-      alert("Error fetching researcher");
     });
     setIsEditing(false);
   };
@@ -111,7 +109,6 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
     })
     .catch((error: any) => {
       console.log(error);
-      alert("Error deleting researcher");
     });
     setShowDeleteConfirm(false);
   };

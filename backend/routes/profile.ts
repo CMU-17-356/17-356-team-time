@@ -40,7 +40,7 @@ router.get("/:profileId", (async (req, res) => {
     const params = {
       TableName: TableNames.PROFILES,
       Key: {
-        profileId: req.params.profileId,
+        userId: req.params.profileId,
       },
     };
 
@@ -81,7 +81,7 @@ router.put("/:profileId", (async (req, res) => {
     const params = {
       TableName: TableNames.PROFILES,
       Key: {
-        profileId: req.params.profileId,
+        userId: req.params.profileId,
       },
       UpdateExpression: `SET ${updateExpressions.join(", ")}`,
       ExpressionAttributeNames: expressionAttributeNames,
@@ -98,7 +98,7 @@ router.put("/:profileId", (async (req, res) => {
     res.json(result.Attributes);
   } catch (error) {
     console.error("Error updating profile:", error);
-    res.status(500).json({ error: "Could not update profile" });
+    res.status(500).json({ error: `Could not update profile: ${req.params.profileId} + ${error}` });
   }
 }) as RequestHandler);
 
@@ -108,7 +108,7 @@ router.delete("/:profileId", (async (req, res) => {
     const params = {
       TableName: TableNames.PROFILES,
       Key: {
-        profileId: req.params.profileId,
+        userId: req.params.profileId,
       },
     };
 
@@ -116,7 +116,7 @@ router.delete("/:profileId", (async (req, res) => {
     res.status(204).send();
   } catch (error) {
     console.error("Error deleting profile:", error);
-    res.status(500).json({ error: "Could not delete profile" + error });
+    res.status(500).json({ error: `Could not delete profile: ${req.params.profileId} + ${error}` });
   }
 }) as RequestHandler);
 
