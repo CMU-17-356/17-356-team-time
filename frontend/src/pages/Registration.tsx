@@ -6,6 +6,7 @@ const API_BASE_URL = "http://localhost:5001/api/profiles";
 
 const UserRegistration: React.FC = () => {
     const [formData, setFormData] = useState({
+        profileId: "",
         userId: "",
         firstName: "",
         lastName: "",
@@ -30,6 +31,7 @@ const UserRegistration: React.FC = () => {
         }
         try {
             const res = await axios.post(API_BASE_URL, {
+                profileId:formData.userId,
                 userId: formData.userId,
                 firstName: formData.firstName,
                 lastName: formData.lastName,
