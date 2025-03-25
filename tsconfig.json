@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2018",
-    "module": "CommonJS",
+    "module": "ESNext",
     "lib": ["ES2018"],
     "outDir": "./dist",
     "rootDir": "./",
@@ -16,6 +16,6 @@
       "*": ["node_modules/*"]
     }
   },
-  "include": ["backend/**/*", "db/**/*"],
+  "include": ["backend/**/*"],
   "exclude": ["node_modules", "dist"]
 }
