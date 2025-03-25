@@ -1,49 +1,45 @@
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router";
 import { ProfilePage } from "./ProfilePage";
-import { API_ENDPOINT, defaultResearcher, emptyResearcher } from "./consts";
+import { API_ENDPOINT } from "./consts";
+import { Home } from "./routes/Home";
 import { Researcher } from "./types";
 
 function App() {
   const [profiles, setProfiles] = useState<Researcher[]>([]);
-  const [researcher, setResearcher] = useState(emptyResearcher);
 
-  const createProfile = () => {
-    if (researcher.profileId === "nouser") {
-      console.log("trying to create researcher with id: ", defaultResearcher.profileId);
-      axios.post(API_ENDPOINT, defaultResearcher)
-      .then((response) => {
-        setResearcher({...defaultResearcher, ...response.data});
-        setProfiles([...profiles, response.data]);
-        console.log(response);
-      })
-      .catch((error: any) => {
-        console.log(error);
-      });
-    } else {
-      console.log("researcher already exists");
-    }
-  }
+  useEffect(() => {
+    console.log("trying to fetch all profiles");
+    axios.get(API_ENDPOINT).then((response) => {
+      if (response.data.profiles) {
+        setProfiles(response.data.profiles);
+        console.log(response.data.profiles);
+      }
+    }).catch((error) => {
+      console.log(error);
+    });
+  }, []);
 
   // useEffect(() => {
-  //   console.log("trying to fetch all profiles");
-  //   axios.get(API_ENDPOINT).then((response) => {
-  //     if (response.data.profiles) {
-  //       setProfiles(response.data.profiles);
-  //     }
+  //   console.log("trying to fetch researcher with id: ", defaultResearcher.profileId);
+  //   axios.get(`${API_ENDPOINT}/${defaultResearcher.profileId}`).then((response) => {
+  //     // setResearcher({...researcher, ...response.data});
+  //     console.log("fetched researcher: ", response.data)
   //   }).catch((error) => {
   //     console.log(error);
   //   });
   // }, []);
 
+  console.log("all profiles", profiles);
+
   return (
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<div>Reach</div>} key="route-base">
-            <Route index element={<div className="w-20 h-20 rounded-lg bg-blue-500" onClick={createProfile}>Make</div>} key="route-home" />
-            <Route path="/u/:profile" element={<ProfilePage />} key="route-profile" />
+          <Route path="/" element={<Home profiles={profiles}/>} key="route-base">
+            <Route index element={<Home profiles={profiles}/>} key="route-index" />
+            <Route path="/profile/:profileId" element={<ProfilePage profiles={profiles}/>} key={`route-profile`} />
           </Route>
         </Routes>
       </BrowserRouter>

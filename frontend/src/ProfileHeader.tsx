@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import React, { useRef, useState } from "react";
 import { ProfileInterests } from "./ProfileInterests";
+import { API_ENDPOINT } from "./consts";
 import { ProfileHeaderProps, Researcher } from "./types";
 
 
@@ -79,10 +80,9 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
       bio: tempBio,
       fieldOfInterest: tempInterests,
     }
-    props.setResearcher(researcherExpr);
-    axios.post(`http://localhost:5001/api/profiles/${props.profileId}`, researcherExpr)
-    .then((response: { data: { result: Researcher; }; }) => {
-      props.setResearcher(response.data.result);
+    axios.post(`${API_ENDPOINT}/${props.profileId}`, researcherExpr)
+    .then((response) => {
+      props.setResearcher({...researcherExpr, ...response.data});
     })
     .catch((error: any) => {
       console.log(error);
@@ -105,7 +105,7 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
   // Delete profile
   const handleDeleteProfile = () => {
     // TODO: make an API call to delete the profile
-    axios.delete(`http://localhost:5001/api/profiles/${props.profileId}`)
+    axios.delete(`${API_ENDPOINT}/${props.profileId}`)
     .then(() => {
       alert("Profile deleted successfully!");
     })
