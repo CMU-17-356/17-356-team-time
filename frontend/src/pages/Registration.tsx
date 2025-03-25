@@ -6,6 +6,7 @@ const API_BASE_URL = "http://localhost:5001/api/profiles";
 
 const UserRegistration: React.FC = () => {
     const [formData, setFormData] = useState({
+        userId: "",
         firstName: "",
         lastName: "",
         email: "",
@@ -29,6 +30,7 @@ const UserRegistration: React.FC = () => {
         }
         try {
             const res = await axios.post(API_BASE_URL, {
+                userId: formData.userId,
                 firstName: formData.firstName,
                 lastName: formData.lastName,
                 email: formData.email,
@@ -52,6 +54,11 @@ const UserRegistration: React.FC = () => {
                 <h2 className="text-2xl font-bold mb-4">User Registration</h2>
                 <form onSubmit={handleSubmit} className="w-full">
                     <input 
+                        type="text" name="userId" placeholder="User ID" 
+                        className="w-full p-2 border rounded mb-2" 
+                        onChange={handleChange} required
+                    />
+                    <input 
                         type="text" name="firstName" placeholder="First Name" 
                         className="w-full p-2 border rounded mb-2" 
                         onChange={handleChange} required
@@ -74,17 +81,17 @@ const UserRegistration: React.FC = () => {
                     <input 
                         type="text" name="institution" placeholder="Institution" 
                         className="w-full p-2 border rounded mb-2" 
-                        onChange={handleChange}
+                        onChange={handleChange} required
                     />
                     <input 
                         type="text" name="fieldOfInterest" placeholder="Field of Interest" 
                         className="w-full p-2 border rounded mb-2" 
-                        onChange={handleChange}
+                        onChange={handleChange} required
                     />
                     <input 
                         type="text" name="bio" placeholder="Bio" 
                         className="w-full p-2 border rounded mb-2" 
-                        onChange={handleChange}
+                        onChange={handleChange} required
                     />
                     <input 
                         type="password" name="password" placeholder="Password" 
