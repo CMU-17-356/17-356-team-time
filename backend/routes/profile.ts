@@ -1,7 +1,7 @@
 import express, { RequestHandler } from "express";
 import { v4 as uuidv4 } from "uuid";
-import dynamoDB from "../../db/config/dynamodb";
-import { Profile, TableNames } from "../../db/schemas";
+import dynamoDB from "../db/config/dynamodb";
+import { Profile, TableNames } from "../db/schemas";
 
 const router = express.Router();
 

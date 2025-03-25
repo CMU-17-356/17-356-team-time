@@ -1,8 +1,8 @@
-import request from "supertest";
 import express from "express";
-import profileRouter from "../profile";
-import dynamoDB from "../../../db/config/dynamodb";
+import request from "supertest";
 import { v4 as uuidv4 } from "uuid";
+import dynamoDB from "../../db/config/dynamodb";
+import profileRouter from "../profile";
 
 // Mock DynamoDB
 jest.mock("../../../db/config/dynamodb", () => ({

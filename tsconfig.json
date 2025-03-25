@@ -16,6 +16,6 @@
       "*": ["node_modules/*"]
     }
   },
-  "include": ["backend/**/*", "db/**/*"],
+  "include": ["backend/**/*", "backend/db/**/*"],
   "exclude": ["node_modules", "dist"]
 }
