@@ -41,7 +41,7 @@ describe('ProfileHeader Component', () => {
     // Mock window.open to prevent actual navigation during tests
     window.open = jest.fn();
     // Mock window.location.reload
-    delete window.location;
+    // delete window.location;
     window.alert = jest.fn();
     window.location = { reload: jest.fn() } as any;
   });
