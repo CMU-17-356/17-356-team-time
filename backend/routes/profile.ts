@@ -1,7 +1,6 @@
 import express, { RequestHandler } from "express";
-import { v4 as uuidv4 } from "uuid";
-import dynamoDB from "../../db/config/dynamodb";
-import { Profile, TableNames } from "../../db/schemas";
+import dynamoDB from "../db/config/dynamodb";
+import { Profile, TableNames } from "../db/schemas";
 
 const router = express.Router();
 
@@ -9,7 +8,7 @@ const router = express.Router();
 router.post("/", (async (req, res) => {
   try {
     const profile: Profile = {
-      profileId: uuidv4(),
+      profileId: "", // DO NOT USE
       userId: req.body.userId,
       firstName: req.body.firstName,
       lastName: req.body.lastName,
@@ -31,17 +30,17 @@ router.post("/", (async (req, res) => {
     res.status(201).json(profile);
   } catch (error) {
     console.error("Error creating profile:", error);
-    res.status(500).json({ error: "Could not create profile" });
+    res.status(500).json({ error: "Could not create profile: " + error });
   }
 }) as RequestHandler);
 
-// Get a profile by profileId
-router.get("/:profileId", (async (req, res) => {
+// Get a profile by userId
+router.get("/:userId", (async (req, res) => {
   try {
     const params = {
       TableName: TableNames.PROFILES,
       Key: {
-        profileId: req.params.profileId,
+        userId: req.params.userId,
       },
     };
 
@@ -54,12 +53,16 @@ router.get("/:profileId", (async (req, res) => {
     res.json(result.Item);
   } catch (error) {
     console.error("Error fetching profile:", error);
-    res.status(500).json({ error: "Could not fetch profile" });
+    res
+      .status(500)
+      .json({
+        error: `Could not fetch profile with id: ${req.params.userId}. ${error}`,
+      });
   }
 }) as RequestHandler);
 
 // Update a profile
-router.put("/:profileId", (async (req, res) => {
+router.put("/:userId", (async (req, res) => {
   try {
     const updateExpressions: string[] = [];
     const expressionAttributeNames: { [key: string]: string } = {};
@@ -82,7 +85,7 @@ router.put("/:profileId", (async (req, res) => {
     const params = {
       TableName: TableNames.PROFILES,
       Key: {
-        profileId: req.params.profileId,
+        userId: req.params.userId,
       },
       UpdateExpression: `SET ${updateExpressions.join(", ")}`,
       ExpressionAttributeNames: expressionAttributeNames,
@@ -99,17 +102,21 @@ router.put("/:profileId", (async (req, res) => {
     res.json(result.Attributes);
   } catch (error) {
     console.error("Error updating profile:", error);
-    res.status(500).json({ error: "Could not update profile" });
+    res
+      .status(500)
+      .json({
+        error: `Could not update profile: ${req.params.userId} + ${error}`,
+      });
   }
 }) as RequestHandler);
 
 // Delete a profile
-router.delete("/:profileId", (async (req, res) => {
+router.delete("/:userId", (async (req, res) => {
   try {
     const params = {
       TableName: TableNames.PROFILES,
       Key: {
-        profileId: req.params.profileId,
+        userId: req.params.userId,
       },
     };
 
@@ -117,7 +124,11 @@ router.delete("/:profileId", (async (req, res) => {
     res.status(204).send();
   } catch (error) {
     console.error("Error deleting profile:", error);
-    res.status(500).json({ error: "Could not delete profile" });
+    res
+      .status(500)
+      .json({
+        error: `Could not delete profile: ${req.params.userId} + ${error}`,
+      });
   }
 }) as RequestHandler);
 

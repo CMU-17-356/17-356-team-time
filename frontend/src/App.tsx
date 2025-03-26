@@ -1,15 +1,24 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Landing from "./pages/Landing";
-import Registration from "./pages/Registration";
-
+import { BrowserRouter, Outlet, Route, Routes } from "react-router";
+import Landing from "./routes/Landing";
+import { ProfilePage } from "./routes/ProfilePage";
+import Registration from "./routes/Registration";
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/register" element={<Registration />} />
-      </Routes>
-    </Router>
+    <>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Outlet />} key="route-base">
+            <Route index element={<Landing />} key="route-index" />
+            <Route path="/register" element={<Registration />} />
+            <Route
+              path="/profile/:userId"
+              element={<ProfilePage />}
+              key={`route-profile`}
+            />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </>
   );
 }
 

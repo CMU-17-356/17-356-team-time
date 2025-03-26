@@ -8,6 +8,7 @@ services:
       - "5001:5001"
     environment:
       - NODE_ENV=production
+    env_file: "./backend/.env"
 
   frontend:
     build:
