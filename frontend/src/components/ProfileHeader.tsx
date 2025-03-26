@@ -1,22 +1,22 @@
 import axios from "axios";
 import {
-    Camera,
-    Check,
-    Github,
-    Globe,
-    Linkedin,
-    MoreVertical,
-    Pencil,
-    Trash2,
-    Twitter,
-    Upload,
-    UserPlus,
-    X,
+  Camera,
+  Check,
+  Github,
+  Globe,
+  Linkedin,
+  MoreVertical,
+  Pencil,
+  Trash2,
+  Twitter,
+  Upload,
+  UserPlus,
+  X,
 } from "lucide-react";
 import React, { useRef, useState } from "react";
-import { ProfileInterests } from "./ProfileInterests";
 import { API_ENDPOINT } from "../consts";
 import { Profile, ProfileHeaderProps } from "../types";
+import { ProfileInterests } from "./ProfileInterests";
 
 
 export const ProfileHeader = (props: ProfileHeaderProps) => {
@@ -162,6 +162,7 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
               onMouseEnter={() => isEditing && setProfileHover(true)}
               onMouseLeave={() => setProfileHover(false)}
               onClick={() => isEditing && setShowImageUpload(true)}
+              data-testid="profile-picture-id"
             >
               <img
                 src={props.profilePicture}
@@ -182,7 +183,7 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
               <div className="space-y-4">
                 <div>
                   <label
-                    htmlFor="name"
+                    htmlFor="firstName"
                     className="block text-sm font-medium text-gray-700"
                   >
                     First name
@@ -198,7 +199,7 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
                 </div>
                 <div>
                   <label
-                    htmlFor="name"
+                    htmlFor="lastName"
                     className="block text-sm font-medium text-gray-700"
                   >
                     Last name
@@ -253,10 +254,10 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
                     {/* Follow Stats */}
                     <div className="mt-2 flex space-x-4 text-sm">
                       <span>
-                        <strong>{props.following}</strong> Following
+                        <strong data-testid="following-count-id">{props.following}</strong> Following
                       </span>
                       <span>
-                        <strong>{props.followers}</strong> Followers
+                        <strong data-testid="follower-count-id">{props.followers}</strong> Followers
                       </span>
                     </div>
                   </div>
@@ -267,6 +268,7 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
                       <button
                         onClick={() => setShowMenu(!showMenu)}
                         className="p-2 rounded-full hover:bg-gray-200"
+                        data-testid="hamburger-menu-button"
                       >
                         <MoreVertical size={20} />
                       </button>
@@ -328,6 +330,7 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
                     <a
                       href={props.socials.twitter}
                       className="text-gray-600 hover:text-blue-500"
+                      data-testid="twitter-link"
                     >
                       <Twitter size={20} />
                     </a>
@@ -336,6 +339,7 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
                     <a
                       href={props.socials.github}
                       className="text-gray-600 hover:text-gray-900"
+                      data-testid="github-link"
                     >
                       <Github size={20} />
                     </a>
@@ -344,6 +348,7 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
                     <a
                       href={props.socials.linkedin}
                       className="text-gray-600 hover:text-blue-700"
+                      data-testid="linkedin-link"
                     >
                       <Linkedin size={20} />
                     </a>
@@ -352,6 +357,7 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
                     <a
                       href={props.socials.website}
                       className="text-gray-600 hover:text-green-600"
+                      data-testid="website-link"
                     >
                       <Globe size={20} />
                     </a>
