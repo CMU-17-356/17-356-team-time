@@ -20,12 +20,17 @@ export const ProfileInterests = (props: ResearchInterestProps) => {
   // Handle interests submission
   const handleInterestsSubmit = () => {
     if (interestsInput.trim()) {
-      // Parse comma-separated values, trim whitespace, and filter out empty strings
-      const newInterests = tempInterests.split(",").concat(interestsInput
+      const cleanInterestInput = (input: string) => [...new Set(input
         .split(",")
-        .map((i) => i.trim())
-        .filter((i) => i !== ""))
-        .join(",");
+        .map((i) => i.trim().replace(",", ""))
+        .filter((i) => i !== ""))]
+      let newInterests = "";
+      // Parse comma-separated values, trim whitespace, and filter out empty strings
+      if (tempInterests.length > 0) {
+        newInterests = cleanInterestInput(tempInterests + "," + interestsInput).join(",");
+      } else {
+        newInterests = cleanInterestInput(interestsInput).join(",");
+      }
 
       setTempInterests(newInterests);
       props.onSubmit(newInterests);
@@ -109,7 +114,6 @@ export const ProfileInterests = (props: ResearchInterestProps) => {
                       className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded"
                     >
                       {interest}
-                      {index < props.fieldOfInterest?.split(",").length - 1 && ","}
                     </span>
                   ))
                 ) : (
