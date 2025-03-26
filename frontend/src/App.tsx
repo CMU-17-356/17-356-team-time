@@ -8,7 +8,6 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Outlet />} key="route-base">
-            {/* <Route index element={<Home profiles={profiles}/>} key="route-index" /> */}
             <Route index element={<Landing />} key="route-index"/>
             <Route path="/register" element={<Registration />} />
             <Route path="/profile/:userId" element={<ProfilePage />} key={`route-profile`} />
