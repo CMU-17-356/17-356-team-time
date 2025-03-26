@@ -1,0 +1,21 @@
+name: ci
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  jest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Frontend Tests
+        working-directory: ./frontend
+        run: |
+          npm install
+          npm test
