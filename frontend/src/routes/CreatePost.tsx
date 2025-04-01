@@ -78,6 +78,14 @@ const CreatePost: React.FC = () => {
     }
   };
 
+  const handleFileUpload = () => {
+    alert("File upload functionality!");
+  };
+
+  const handleImageUpload = () => {
+    alert("Image upload functionality!");
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -175,6 +183,53 @@ const CreatePost: React.FC = () => {
             onChange={handleChange}
             required
           />
+
+          {/* File and Image Upload UI */}
+          <div className="mb-4 flex gap-2">
+            <button
+              type="button"
+              onClick={handleFileUpload}
+              className="flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
+                />
+              </svg>
+              Attach File
+            </button>
+
+            <button
+              type="button"
+              onClick={handleImageUpload}
+              className="flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+              Add Image
+            </button>
+          </div>
 
           <div className="mb-4">
             <div className="flex gap-2 items-center">
