@@ -25,7 +25,6 @@ async function addDummyUser(): Promise<string> {
 
 async function addDummyProfile(userId: string): Promise<void> {
   const profile: Profile = {
-    profileId: uuidv4(),
     userId: userId,
     firstName: "Daniel",
     lastName: "Sung",

@@ -8,7 +8,6 @@ const router = express.Router();
 router.post("/", (async (req, res) => {
   try {
     const profile: Profile = {
-      profileId: "", // DO NOT USE
       userId: req.body.userId,
       firstName: req.body.firstName,
       lastName: req.body.lastName,
@@ -53,7 +52,11 @@ router.get("/:userId", (async (req, res) => {
     res.json(result.Item);
   } catch (error) {
     console.error("Error fetching profile:", error);
-    res.status(500).json({ error: `Could not fetch profile with id: ${req.params.userId}. ${error}` });
+    res
+      .status(500)
+      .json({
+        error: `Could not fetch profile with id: ${req.params.userId}. ${error}`,
+      });
   }
 }) as RequestHandler);
 
@@ -98,7 +101,11 @@ router.put("/:userId", (async (req, res) => {
     res.json(result.Attributes);
   } catch (error) {
     console.error("Error updating profile:", error);
-    res.status(500).json({ error: `Could not update profile: ${req.params.userId} + ${error}` });
+    res
+      .status(500)
+      .json({
+        error: `Could not update profile: ${req.params.userId} + ${error}`,
+      });
   }
 }) as RequestHandler);
 
@@ -116,7 +123,11 @@ router.delete("/:userId", (async (req, res) => {
     res.status(204).send();
   } catch (error) {
     console.error("Error deleting profile:", error);
-    res.status(500).json({ error: `Could not delete profile: ${req.params.userId} + ${error}` });
+    res
+      .status(500)
+      .json({
+        error: `Could not delete profile: ${req.params.userId} + ${error}`,
+      });
   }
 }) as RequestHandler);
 
