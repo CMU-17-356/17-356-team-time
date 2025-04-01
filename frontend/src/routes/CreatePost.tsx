@@ -103,7 +103,7 @@ const CreatePost: React.FC = () => {
     setError("");
 
     try {
-      const response = await axios.post(`${API_ENDPOINT}/posts`, {
+      const response = await axios.post("http://localhost:5001/api/posts", {
         title: formData.title,
         content: formData.content,
         tags: tags,
