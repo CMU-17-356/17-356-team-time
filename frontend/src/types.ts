@@ -35,3 +35,29 @@ export interface ProfileHeaderProps extends Researcher {
   setResearcher: (researcher: Researcher) => void;
   isFollowing: boolean;
 }
+
+export interface Post {
+  postId: string;
+  authorId: string;
+  authorName: string;
+  authorProfilePicture: string;
+  title: string;
+  content: string;
+  attachments?: string[]; // URLs to PDF files
+  likeCount: number;
+  commentCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PostFeedProps {
+  posts: Post[];
+  isLoading: boolean;
+  error?: string;
+}
+
+export interface PostCardProps {
+  post: Post;
+  onLike?: (postId: string) => void;
+  onComment?: (postId: string) => void;
+}
