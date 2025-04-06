@@ -1,14 +1,14 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router";
-import { API_ENDPOINT } from "../consts";
+import { PROFILE_API_ENDPOINT } from "../consts";
 import { Researcher } from "../types";
 
 export default function LandingPage() {
     const [profiles, setProfiles] = useState<Researcher[]>([]);
 
     useEffect(() => {
-    axios.get(API_ENDPOINT).then((response) => {
+    axios.get(PROFILE_API_ENDPOINT).then((response) => {
     if (response.data.profiles) {
         setProfiles(response.data.profiles);
     }

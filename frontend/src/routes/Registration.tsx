@@ -2,7 +2,7 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router";
-import { API_ENDPOINT } from "../consts";
+import { PROFILE_API_ENDPOINT } from "../consts";
 
 const UserRegistration: React.FC = () => {
   const navigate = useNavigate();
@@ -30,7 +30,7 @@ const UserRegistration: React.FC = () => {
       return;
     }
     try {
-      const res = await axios.post(API_ENDPOINT, {
+      const res = await axios.post(PROFILE_API_ENDPOINT, {
         userId: formData.userId,
         firstName: formData.firstName,
         lastName: formData.lastName,
