@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import dynamoDB from "../../db/config/dynamodb";
 import postsRouter from "../posts";
 
-// Mock DynamoDB
+// Mock DynamoDB - only mock methods we actually use
 jest.mock("../../db/config/dynamodb", () => ({
   put: jest.fn().mockReturnThis(),
   get: jest.fn().mockReturnThis(),
@@ -31,6 +31,10 @@ describe("Posts Routes", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.spyOn(console, "error").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   describe("POST /api/posts", () => {
@@ -95,9 +99,16 @@ describe("Posts Routes", () => {
 
   describe("GET /api/posts", () => {
     it("should get all posts with pagination", async () => {
+      // Mock the scan operation more explicitly
       const mockPosts = [mockPost];
+      const mockPromise = jest.fn().mockResolvedValue({
+        Items: mockPosts,
+        Count: 1,
+        ScannedCount: 1,
+      });
+
       (dynamoDB.scan as jest.Mock).mockReturnValue({
-        promise: jest.fn().mockResolvedValue({ Items: mockPosts }),
+        promise: mockPromise,
       });
 
       const response = await request(app)
