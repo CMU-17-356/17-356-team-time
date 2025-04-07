@@ -21,7 +21,6 @@ app.use("/api/profiles", profileRouter);
 
 describe("Profile Routes", () => {
   const mockProfile = {
-    profileId: "",
     userId: uuidv4(),
     firstName: "John",
     lastName: "Doe",

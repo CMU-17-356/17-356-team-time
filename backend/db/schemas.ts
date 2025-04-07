@@ -1,19 +1,11 @@
 /**
- * The basic User model
+ * Profile model - extends User since it contains duplicate information
  */
-export interface User {
-  userId: string;
+export interface Profile {
+  userId: string; // Primary key
   firstName: string;
   lastName: string;
   email: string;
-  createdAt: string;
-}
-
-/**
- * Profile model - extends User since it contains duplicate information
- */
-export interface Profile extends User {
-  profileId: string; // Primary key
   createdAt: string;
   updatedAt?: string;
   phone?: string; // Optional
@@ -22,8 +14,22 @@ export interface Profile extends User {
   bio?: string; // Optional
 }
 
+/**
+ * Post model - represents a user's post
+ */
+export interface Post {
+  postId: string; // Primary key
+  userId: string; // Foreign key to Profile.userId
+  title: string;
+  content: string;
+  tags: string[]; // Array of tags like "machine learning", "computer vision", etc.
+  likeCount: number;
+  createdAt: string;
+  updatedAt?: string;
+}
+
 // Table names as constants for easier referencing
 export enum TableNames {
-  USERS = "Users",
   PROFILES = "Profiles",
+  POSTS = "Posts",
 }

@@ -2,6 +2,9 @@ import { BrowserRouter, Outlet, Route, Routes } from "react-router";
 import Landing from "./routes/Landing";
 import { ProfilePage } from "./routes/ProfilePage";
 import Registration from "./routes/Registration";
+import { FeedPage } from "./routes/FeedPage";
+import CreatePost from "./routes/CreatePost";
+
 function App() {
   return (
     <>
@@ -15,7 +18,13 @@ function App() {
               element={<ProfilePage />}
               key={`route-profile`}
             />
+            <Route
+              path="/create-post"
+              element={<CreatePost />}
+              key="route-create-post"
+            />
           </Route>
+          <Route path="/feed" element={<FeedPage />} />
         </Routes>
       </BrowserRouter>
     </>
