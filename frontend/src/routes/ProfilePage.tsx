@@ -9,7 +9,7 @@ export const ProfilePage = () => {
   const [researcher, setResearcher] = useState<Researcher | null>();
   const { userId } = useParams<{ userId: string }>();
   useEffect(() => {
-    console.log("trying to fetch researcher with id: ", userId);
+    console.log("trying to fetch user with id: ", userId);
     axios
       .get(`${PROFILE_API_ENDPOINT}/${userId}`)
       .then((response) => {

@@ -1,0 +1,1 @@
+{"root":["../backend/index.ts","../backend/db/schemas.ts","../backend/db/testing-dummy-data.ts","../backend/db/config/dynamodb.ts","../backend/routes/profile.ts","../backend/routes/__tests__/profile.test.ts","../backend/tests/index.test.ts"],"errors":true,"version":"5.8.2"}
