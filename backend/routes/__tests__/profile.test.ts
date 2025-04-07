@@ -6,7 +6,7 @@ import dynamoDB from "../../db/config/dynamodb";
 import profileRouter from "../profile";
 
 // Mock DynamoDB
-jest.mock("../../../db/config/dynamodb", () => ({
+jest.mock("../../db/config/dynamodb", () => ({
   put: jest.fn().mockReturnThis(),
   get: jest.fn().mockReturnThis(),
   update: jest.fn().mockReturnThis(),
@@ -21,7 +21,6 @@ app.use("/api/profiles", profileRouter);
 
 describe("Profile Routes", () => {
   const mockProfile = {
-    profileId: "",
     userId: uuidv4(),
     firstName: "John",
     lastName: "Doe",
@@ -34,6 +33,7 @@ describe("Profile Routes", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.spyOn(console, "error").mockImplementation(() => {});
   });
 
   describe("POST /api/profiles", () => {
@@ -42,7 +42,7 @@ describe("Profile Routes", () => {
         promise: jest.fn().mockResolvedValue({}),
       });
 
-      const { userId, createdAt, updatedAt, ...profileData } = mockProfile;
+      const { createdAt, updatedAt, ...profileData } = mockProfile;
       const response = await request(app)
         .post("/api/profiles")
         .send(profileData);
