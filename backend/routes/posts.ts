@@ -32,32 +32,6 @@ router.post("/", (async (req, res) => {
   }
 }) as RequestHandler);
 
-// Get a post by postId
-router.get("/:postId", (async (req, res) => {
-  try {
-    const params = {
-      TableName: TableNames.POSTS,
-      Key: {
-        postId: req.params.postId,
-      },
-    };
-
-    const result = await dynamoDB.get(params).promise();
-
-    if (!result.Item) {
-      return res.status(404).json({ error: "Post not found" });
-    }
-
-    res.json(result.Item);
-  } catch (error) {
-    console.error("Error fetching post:", error);
-    res.status(500).json({
-      error: `Could not fetch post with id: ${req.params.postId}. ${error}`,
-    });
-  }
-}) as RequestHandler);
-
-// Get all posts in db
 router.get("/", (async (req, res) => {
   try {
     const limit = parseInt(req.query.limit as string) || 10;
@@ -80,6 +54,30 @@ router.get("/", (async (req, res) => {
   } catch (error) {
     console.error("Error fetching posts:", error);
     res.status(500).json({ error: "Could not fetch posts" });
+  }
+}) as RequestHandler);
+
+router.get("/:postId", (async (req, res) => {
+  try {
+    const params = {
+      TableName: TableNames.POSTS,
+      Key: {
+        postId: req.params.postId,
+      },
+    };
+
+    const result = await dynamoDB.get(params).promise();
+
+    if (!result.Item) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    res.json(result.Item);
+  } catch (error) {
+    console.error("Error fetching post:", error);
+    res.status(500).json({
+      error: `Could not fetch post with id: ${req.params.postId}. ${error}`,
+    });
   }
 }) as RequestHandler);
 
