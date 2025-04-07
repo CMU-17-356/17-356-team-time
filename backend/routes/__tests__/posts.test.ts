@@ -114,7 +114,7 @@ describe("Posts Routes", () => {
       const response = await request(app)
         .get("/api/posts")
         .query({ limit: "10" });
-
+      console.log(response);
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty("posts");
       expect(response.body.posts).toEqual(mockPosts);
