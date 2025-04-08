@@ -1,7 +1,8 @@
 // import profileImg from "./assets/profile.jpg";
 import { Researcher, SocialLinks } from "./types";
 
-export const API_ENDPOINT = "http://localhost:5001/api/profiles";
+export const PROFILE_API_ENDPOINT = "http://localhost:5001/api/profiles";
+export const POST_API_ENDPOINT = "http://localhost:5001/api/posts";
 
 export const emptyResearcher: Researcher = {
   firstName: "n/a",
@@ -20,4 +21,4 @@ export const emptyResearcher: Researcher = {
   } as SocialLinks,
   bio: "",
   fieldOfInterest: "",
-}
+};

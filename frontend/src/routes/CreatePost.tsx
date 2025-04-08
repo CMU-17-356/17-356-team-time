@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router";
-import { API_ENDPOINT } from "../consts";
+import { PROFILE_API_ENDPOINT } from "../consts";
 
 interface Profile {
   userId: string;
@@ -27,7 +27,7 @@ const CreatePost: React.FC = () => {
   useEffect(() => {
     const fetchProfiles = async () => {
       try {
-        const response = await axios.get(`${API_ENDPOINT}`);
+        const response = await axios.get(`${PROFILE_API_ENDPOINT}`);
         setProfiles(response.data.profiles || []);
 
         // Set the first profile as default if available
