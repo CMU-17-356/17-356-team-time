@@ -48,8 +48,10 @@ router.get("/", (async (req, res) => {
     const result = await dynamoDB.scan(params).promise();
 
     res.json({
-      posts: result.Items,
-      lastEvaluatedKey: result.LastEvaluatedKey,
+      posts: result.Items || [],
+      ...(result.LastEvaluatedKey && {
+        lastEvaluatedKey: result.LastEvaluatedKey,
+      }),
     });
   } catch (error) {
     console.error("Error fetching posts:", error);
