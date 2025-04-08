@@ -11,7 +11,10 @@ export const PostCard = ({ post, onLike, onComment }: PostCardProps) => {
           className="w-10 h-10 rounded-full mr-3"
         />
         <div>
-          <Link to={`/profile/${post.authorId}`} className="font-semibold hover:text-[#faab99]">
+          <Link
+            to={`/profile/${post.authorId}`}
+            className="font-semibold hover:text-[#faab99]"
+          >
             {post.authorName}
           </Link>
           <p className="text-sm text-gray-500">
@@ -60,4 +63,4 @@ export const PostCard = ({ post, onLike, onComment }: PostCardProps) => {
       </div>
     </div>
   );
-}; 
+};

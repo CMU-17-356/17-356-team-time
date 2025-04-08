@@ -1,13 +1,12 @@
-import express, { RequestHandler } from "express";
+import express from "express";
 import dynamoDB from "../db/config/dynamodb";
-import { Profile, TableNames } from "../db/schemas";
-
+import { TableNames } from "../db/schemas";
 const router = express.Router();
-
 // Create a new profile
-router.post("/", (async (req, res) => {
+router.post("/", async (req, res) => {
   try {
-    const profile: Profile = {
+    const profile = {
+      profileId: "", // DO NOT USE
       userId: req.body.userId,
       firstName: req.body.firstName,
       lastName: req.body.lastName,
@@ -19,22 +18,19 @@ router.post("/", (async (req, res) => {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-
     const params = {
       TableName: TableNames.PROFILES,
       Item: profile,
     };
-
     await dynamoDB.put(params).promise();
     res.status(201).json(profile);
   } catch (error) {
     console.error("Error creating profile:", error);
     res.status(500).json({ error: "Could not create profile: " + error });
   }
-}) as RequestHandler);
-
+});
 // Get a profile by userId
-router.get("/:userId", (async (req, res) => {
+router.get("/:userId", async (req, res) => {
   try {
     const params = {
       TableName: TableNames.PROFILES,
@@ -42,13 +38,10 @@ router.get("/:userId", (async (req, res) => {
         userId: req.params.userId,
       },
     };
-
     const result = await dynamoDB.get(params).promise();
-
     if (!result.Item) {
       return res.status(404).json({ error: "Profile not found" });
     }
-
     res.json(result.Item);
   } catch (error) {
     console.error("Error fetching profile:", error);
@@ -56,15 +49,13 @@ router.get("/:userId", (async (req, res) => {
       error: `Could not fetch profile with id: ${req.params.userId}. ${error}`,
     });
   }
-}) as RequestHandler);
-
+});
 // Update a profile
-router.put("/:userId", (async (req, res) => {
+router.put("/:userId", async (req, res) => {
   try {
-    const updateExpressions: string[] = [];
-    const expressionAttributeNames: { [key: string]: string } = {};
-    const expressionAttributeValues: { [key: string]: any } = {};
-
+    const updateExpressions = [];
+    const expressionAttributeNames = {};
+    const expressionAttributeValues = {};
     // Build update expression dynamically based on provided fields
     Object.entries(req.body).forEach(([key, value]) => {
       if (value !== undefined) {
@@ -73,12 +64,10 @@ router.put("/:userId", (async (req, res) => {
         expressionAttributeValues[`:${key}`] = value;
       }
     });
-
     // Always update the updatedAt timestamp
     updateExpressions.push("#updatedAt = :updatedAt");
     expressionAttributeNames["#updatedAt"] = "updatedAt";
     expressionAttributeValues[":updatedAt"] = new Date().toISOString();
-
     const params = {
       TableName: TableNames.PROFILES,
       Key: {
@@ -89,13 +78,10 @@ router.put("/:userId", (async (req, res) => {
       ExpressionAttributeValues: expressionAttributeValues,
       ReturnValues: "ALL_NEW",
     };
-
     const result = await dynamoDB.update(params).promise();
-
     if (!result.Attributes) {
       return res.status(404).json({ error: "Profile not found" });
     }
-
     res.json(result.Attributes);
   } catch (error) {
     console.error("Error updating profile:", error);
@@ -103,10 +89,9 @@ router.put("/:userId", (async (req, res) => {
       error: `Could not update profile: ${req.params.userId} + ${error}`,
     });
   }
-}) as RequestHandler);
-
+});
 // Delete a profile
-router.delete("/:userId", (async (req, res) => {
+router.delete("/:userId", async (req, res) => {
   try {
     const params = {
       TableName: TableNames.PROFILES,
@@ -114,7 +99,6 @@ router.delete("/:userId", (async (req, res) => {
         userId: req.params.userId,
       },
     };
-
     await dynamoDB.delete(params).promise();
     res.status(204).send();
   } catch (error) {
@@ -123,24 +107,20 @@ router.delete("/:userId", (async (req, res) => {
       error: `Could not delete profile: ${req.params.userId} + ${error}`,
     });
   }
-}) as RequestHandler);
-
+});
 // Get all profiles (with optional pagination)
-router.get("/", (async (req, res) => {
+router.get("/", async (req, res) => {
   try {
-    const limit = parseInt(req.query.limit as string) || 10;
+    const limit = parseInt(req.query.limit) || 10;
     const lastEvaluatedKey = req.query.lastEvaluatedKey
-      ? JSON.parse(req.query.lastEvaluatedKey as string)
+      ? JSON.parse(req.query.lastEvaluatedKey)
       : undefined;
-
     const params = {
       TableName: TableNames.PROFILES,
       Limit: limit,
       ...(lastEvaluatedKey && { ExclusiveStartKey: lastEvaluatedKey }),
     };
-
     const result = await dynamoDB.scan(params).promise();
-
     res.json({
       profiles: result.Items,
       lastEvaluatedKey: result.LastEvaluatedKey,
@@ -149,6 +129,5 @@ router.get("/", (async (req, res) => {
     console.error("Error fetching profiles:", error);
     res.status(500).json({ error: "Could not fetch profiles" });
   }
-}) as RequestHandler);
-
+});
 export default router;

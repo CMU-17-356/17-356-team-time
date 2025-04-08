@@ -18,7 +18,6 @@ import { PROFILE_API_ENDPOINT } from "../consts";
 import { Profile, ProfileHeaderProps } from "../types";
 import { ProfileInterests } from "./ProfileInterests";
 
-
 export const ProfileHeader = (props: ProfileHeaderProps) => {
   const [showMenu, setShowMenu] = useState(false);
   const [profileHover, setProfileHover] = useState(false);
@@ -27,7 +26,9 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
   const [isFollowing, setisFollowing] = useState(props.isFollowing);
   const [isEditing, setIsEditing] = useState(false);
   const [tempBio, setTempBio] = useState(props.bio);
-  const [tempInterests, setTempInterests] = useState(props.fieldOfInterest || "");
+  const [tempInterests, setTempInterests] = useState(
+    props.fieldOfInterest || "",
+  );
 
   // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -59,8 +60,6 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
     setTempBio(e.target.value);
   };
 
-
-
   // Handle form changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -78,16 +77,17 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
       institution: editFormData.affiliation,
       bio: tempBio,
       fieldOfInterest: tempInterests,
-    }
-    axios.put(`${PROFILE_API_ENDPOINT}/${props.userId}`, researcherExpr)
-    .then((response) => {
-      props.setResearcher({...researcherExpr, ...response.data});
-      setIsEditing(false);
-      window.location.reload();
-    })
-    .catch((error: any) => {
-      console.log(error);
-    });
+    };
+    axios
+      .put(`${PROFILE_API_ENDPOINT}/${props.userId}`, researcherExpr)
+      .then((response) => {
+        props.setResearcher({ ...researcherExpr, ...response.data });
+        setIsEditing(false);
+        window.location.reload();
+      })
+      .catch((error: any) => {
+        console.log(error);
+      });
     setIsEditing(false);
   };
 
@@ -105,14 +105,15 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
   // Delete profile
   const handleDeleteProfile = () => {
     // TODO: make an API call to delete the profile
-    axios.delete(`${PROFILE_API_ENDPOINT}/${props.userId}`)
-    .then(() => {
-      alert("Profile deleted successfully!");
-      window.open("/");
-    })
-    .catch((error: any) => {
-      console.log(error);
-    });
+    axios
+      .delete(`${PROFILE_API_ENDPOINT}/${props.userId}`)
+      .then(() => {
+        alert("Profile deleted successfully!");
+        window.open("/");
+      })
+      .catch((error: any) => {
+        console.log(error);
+      });
     setShowDeleteConfirm(false);
   };
 
@@ -254,10 +255,16 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
                     {/* Follow Stats */}
                     <div className="mt-2 flex space-x-4 text-sm">
                       <span>
-                        <strong data-testid="following-count-id">{props.following}</strong> Following
+                        <strong data-testid="following-count-id">
+                          {props.following}
+                        </strong>{" "}
+                        Following
                       </span>
                       <span>
-                        <strong data-testid="follower-count-id">{props.followers}</strong> Followers
+                        <strong data-testid="follower-count-id">
+                          {props.followers}
+                        </strong>{" "}
+                        Followers
                       </span>
                     </div>
                   </div>
@@ -368,7 +375,13 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
           </div>
         </div>
 
-       <ProfileInterests {...{fieldOfInterest: tempInterests, isEditing, onSubmit: setTempInterests}}/>
+        <ProfileInterests
+          {...{
+            fieldOfInterest: tempInterests,
+            isEditing,
+            onSubmit: setTempInterests,
+          }}
+        />
 
         {/* Bio Section */}
         <div className="border-t-2 border-slate-200 pt-2">

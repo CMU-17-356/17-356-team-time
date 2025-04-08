@@ -11,7 +11,8 @@ const dummyPosts = [
     postId: uuidv4(),
     userId: "dummy-user-1",
     title: "New Research in Quantum Computing",
-    content: "Excited to share our latest findings in quantum error correction!",
+    content:
+      "Excited to share our latest findings in quantum error correction!",
     tags: ["quantum computing", "research"],
     likeCount: 42,
     createdAt: new Date().toISOString(),
@@ -22,7 +23,8 @@ const dummyPosts = [
     postId: uuidv4(),
     userId: "dummy-user-2",
     title: "Machine Learning Breakthrough",
-    content: "Our team has developed a new approach to neural network optimization.",
+    content:
+      "Our team has developed a new approach to neural network optimization.",
     tags: ["machine learning", "AI"],
     likeCount: 28,
     createdAt: new Date().toISOString(),
@@ -33,7 +35,8 @@ const dummyPosts = [
     postId: uuidv4(),
     userId: "dummy-user-3",
     title: "Climate Change Research Update",
-    content: "New data analysis shows significant changes in global temperature patterns.",
+    content:
+      "New data analysis shows significant changes in global temperature patterns.",
     tags: ["climate science", "environment"],
     likeCount: 15,
     createdAt: new Date().toISOString(),
@@ -69,7 +72,33 @@ router.post("/", (async (req, res) => {
   }
 }) as RequestHandler);
 
-// Get a post by postId
+router.get("/", (async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit as string) || 10;
+    const lastEvaluatedKey = req.query.lastEvaluatedKey
+      ? JSON.parse(req.query.lastEvaluatedKey as string)
+      : undefined;
+
+    const params = {
+      TableName: TableNames.POSTS,
+      Limit: limit,
+      ...(lastEvaluatedKey && { ExclusiveStartKey: lastEvaluatedKey }),
+    };
+
+    const result = await dynamoDB.scan(params).promise();
+
+    res.json({
+      posts: result.Items || [],
+      ...(result.LastEvaluatedKey && {
+        lastEvaluatedKey: result.LastEvaluatedKey,
+      }),
+    });
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    res.status(500).json({ error: "Could not fetch posts" });
+  }
+}) as RequestHandler);
+
 router.get("/:postId", (async (req, res) => {
   try {
     const params = {
@@ -110,14 +139,14 @@ router.get("/", (async (req, res) => {
     };
 
     const postsResult = await dynamoDB.scan(postsParams).promise();
-    
+
     let posts = postsResult.Items;
-    
+
     // If no posts exist, use dummy data
     if (!posts || posts.length === 0) {
       posts = dummyPosts;
     }
-    
+
     // Get author information for each post
     const postsWithAuthors = await Promise.all(
       posts.map(async (post) => {
@@ -129,20 +158,20 @@ router.get("/", (async (req, res) => {
             commentCount: 0,
           };
         }
-        
+
         // For real posts, fetch author info from profiles
         const profileParams = {
           TableName: TableNames.PROFILES,
           Key: { userId: post.userId },
         };
-        
+
         const profileResult = await dynamoDB.get(profileParams).promise();
         const profile = profileResult.Item as Profile;
-        
+
         // Generate a random profile picture URL for real posts
         const randomImageId = Math.floor(Math.random() * 70) + 1; // Random number between 1-70
         const profilePicture = `https://i.pravatar.cc/150?img=${randomImageId}`;
-        
+
         return {
           ...post,
           authorId: post.userId,
@@ -150,7 +179,7 @@ router.get("/", (async (req, res) => {
           authorProfilePicture: profilePicture,
           commentCount: 0,
         };
-      })
+      }),
     );
 
     res.json({

@@ -1,15 +1,13 @@
 import {
-    ExternalLink,
-    Heart,
-    MessageSquare,
-    Repeat2,
-    Share2,
+  ExternalLink,
+  Heart,
+  MessageSquare,
+  Repeat2,
+  Share2,
 } from "lucide-react";
 import { useState } from "react";
 import { ProfileHeaderProps, Researcher } from "../types";
-import {
-    ProfileHeader,
-} from "./ProfileHeader";
+import { ProfileHeader } from "./ProfileHeader";
 
 interface Post {
   id: string;
@@ -79,8 +77,8 @@ export const ResearcherProfile = (props: Researcher) => {
   const toggleLike = (postId: string) => {
     setPosts(
       posts.map((post) =>
-        post.id === postId ? { ...post, liked: !post.liked } : post
-      )
+        post.id === postId ? { ...post, liked: !post.liked } : post,
+      ),
     );
   };
 
@@ -88,8 +86,8 @@ export const ResearcherProfile = (props: Researcher) => {
   const toggleComment = (postId: string) => {
     setPosts(
       posts.map((post) =>
-        post.id === postId ? { ...post, commentOpen: !post.commentOpen } : post
-      )
+        post.id === postId ? { ...post, commentOpen: !post.commentOpen } : post,
+      ),
     );
   };
 
@@ -116,8 +114,8 @@ export const ResearcherProfile = (props: Researcher) => {
       posts.map((post) =>
         post.id === postId
           ? { ...post, comments: [...post.comments, newComment] }
-          : post
-      )
+          : post,
+      ),
     );
 
     // Clear the comment text
@@ -246,4 +244,3 @@ export const ResearcherProfile = (props: Researcher) => {
     </div>
   );
 };
-

@@ -21,5 +21,10 @@
     "start": "ts-node backend/index.ts",
     "dev": "nodemon --exec ts-node backend/index.ts",
     "build": "tsc"
+  },
+  "jest": {
+    "setupFiles": [
+      "<rootDir>/jest.setup.js"
+    ]
   }
 }

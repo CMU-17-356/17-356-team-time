@@ -44,4 +44,4 @@ export const PostFeed = ({ posts, isLoading, error }: PostFeedProps) => {
       ))}
     </div>
   );
-}; 
+};

@@ -37,4 +37,4 @@ export const FeedPage = () => {
       </div>
     </div>
   );
-}; 
+};
