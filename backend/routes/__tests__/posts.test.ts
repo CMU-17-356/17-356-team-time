@@ -112,7 +112,7 @@ describe("Posts Routes", () => {
 
   describe("GET /api/posts", () => {
     it("should get all posts with pagination", async () => {
-      // For the first scan call
+      // Mock the posts scan
       (dynamoDB.scan as jest.Mock).mockReturnValue({
         promise: jest.fn().mockResolvedValue({
           Items: [mockPost],
@@ -120,8 +120,13 @@ describe("Posts Routes", () => {
         }),
       });
 
-      // Skip authName assertion since in this test environment
-      // we won't have the dummy data
+      // Mock the profile get for author information
+      (dynamoDB.get as jest.Mock).mockReturnValue({
+        promise: jest.fn().mockResolvedValue({
+          Item: mockProfile,
+        }),
+      });
+
       const response = await request(app)
         .get("/api/posts")
         .query({ limit: "10" });
@@ -130,14 +135,30 @@ describe("Posts Routes", () => {
       expect(response.body).toHaveProperty("posts");
       expect(response.body.posts.length).toBeGreaterThan(0);
 
-      // Only test the basic structure, not the enriched fields
+      // Test the enriched post data
       const firstPost = response.body.posts[0];
-      expect(firstPost).toHaveProperty("title", mockPost.title);
+      expect(firstPost).toMatchObject({
+        ...mockPost,
+        authorId: mockPost.userId,
+        authorName: `${mockProfile.firstName} ${mockProfile.lastName}`,
+        authorProfilePicture: expect.stringContaining(
+          "https://i.pravatar.cc/150",
+        ),
+        commentCount: 0,
+      });
 
+      // Verify the DynamoDB calls
       expect(dynamoDB.scan).toHaveBeenCalledWith(
         expect.objectContaining({
           TableName: "Posts",
           Limit: 10,
+        }),
+      );
+
+      expect(dynamoDB.get).toHaveBeenCalledWith(
+        expect.objectContaining({
+          TableName: "Profiles",
+          Key: { userId: mockPost.userId },
         }),
       );
     });

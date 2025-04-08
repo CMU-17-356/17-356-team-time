@@ -72,33 +72,6 @@ router.post("/", (async (req, res) => {
   }
 }) as RequestHandler);
 
-router.get("/", (async (req, res) => {
-  try {
-    const limit = parseInt(req.query.limit as string) || 10;
-    const lastEvaluatedKey = req.query.lastEvaluatedKey
-      ? JSON.parse(req.query.lastEvaluatedKey as string)
-      : undefined;
-
-    const params = {
-      TableName: TableNames.POSTS,
-      Limit: limit,
-      ...(lastEvaluatedKey && { ExclusiveStartKey: lastEvaluatedKey }),
-    };
-
-    const result = await dynamoDB.scan(params).promise();
-
-    res.json({
-      posts: result.Items || [],
-      ...(result.LastEvaluatedKey && {
-        lastEvaluatedKey: result.LastEvaluatedKey,
-      }),
-    });
-  } catch (error) {
-    console.error("Error fetching posts:", error);
-    res.status(500).json({ error: "Could not fetch posts" });
-  }
-}) as RequestHandler);
-
 router.get("/:postId", (async (req, res) => {
   try {
     const params = {
