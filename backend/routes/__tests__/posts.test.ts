@@ -1,13 +1,16 @@
 import express from "express";
+import { beforeEach } from "node:test";
 import request from "supertest";
 import { v4 as uuidv4 } from "uuid";
 import dynamoDB from "../../db/config/dynamodb";
 import postsRouter from "../posts";
 
-// Mock DynamoDB - only mock methods we actually use
+// Mock DynamoDB
 jest.mock("../../db/config/dynamodb", () => ({
   put: jest.fn().mockReturnThis(),
   get: jest.fn().mockReturnThis(),
+  update: jest.fn().mockReturnThis(),
+  delete: jest.fn().mockReturnThis(),
   scan: jest.fn().mockReturnThis(),
   promise: jest.fn(),
 }));
@@ -31,10 +34,6 @@ describe("Posts Routes", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.spyOn(console, "error").mockImplementation(() => {});
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
   });
 
   describe("POST /api/posts", () => {
@@ -99,20 +98,18 @@ describe("Posts Routes", () => {
 
   describe("GET /api/posts", () => {
     it("should get all posts with pagination", async () => {
-      // Mock the scan operation more explicitly
       const mockPosts = [mockPost];
-      const mockPromise = jest.fn().mockResolvedValue({
-        Items: mockPosts,
-        Count: 1,
-        ScannedCount: 1,
-      });
-
       (dynamoDB.scan as jest.Mock).mockReturnValue({
-        promise: mockPromise,
+        promise: jest.fn().mockResolvedValue({
+          Items: mockPosts,
+          LastEvaluatedKey: null,
+        }),
       });
 
-      const response = await request(app).get("/api/posts");
-      console.log(response);
+      const response = await request(app)
+        .get("/api/posts")
+        .query({ limit: "10" });
+
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty("posts");
       expect(response.body.posts).toEqual(mockPosts);
