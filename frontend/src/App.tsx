@@ -1,16 +1,17 @@
-import { BrowserRouter, Outlet, Route, Routes } from "react-router";
+import { BrowserRouter, Route, Routes } from "react-router";
+import { OutletPage } from "./components/OutletPage";
+import CreatePost from "./routes/CreatePost";
+import { FeedPage } from "./routes/FeedPage";
 import Landing from "./routes/Landing";
 import { ProfilePage } from "./routes/ProfilePage";
 import Registration from "./routes/Registration";
-import { FeedPage } from "./routes/FeedPage";
-import CreatePost from "./routes/CreatePost";
 
 function App() {
   return (
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Outlet />} key="route-base">
+          <Route path="/" element={<OutletPage />} key="route-base">
             <Route index element={<Landing />} key="route-index" />
             <Route path="/register" element={<Registration />} />
             <Route
@@ -23,8 +24,8 @@ function App() {
               element={<CreatePost />}
               key="route-create-post"
             />
+            <Route path="/feed" element={<FeedPage />} />
           </Route>
-          <Route path="/feed" element={<FeedPage />} />
         </Routes>
       </BrowserRouter>
     </>

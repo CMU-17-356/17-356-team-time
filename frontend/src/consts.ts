@@ -21,4 +21,4 @@ export const emptyResearcher: Researcher = {
   } as SocialLinks,
   bio: "",
   fieldOfInterest: "",
-}
+};
