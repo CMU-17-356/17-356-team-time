@@ -1,13 +1,18 @@
+// src/App.tsx
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { BrowserRouter, Route, Routes } from "react-router";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { OutletPage } from "./components/OutletPage";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { AuthProvider } from "./context/AuthContext";
 import CreatePost from "./routes/CreatePost";
 import { FeedPage } from "./routes/FeedPage";
 import Landing from "./routes/Landing";
+import Login from "./routes/Login";
 import { ProfilePage } from "./routes/ProfilePage";
 import Registration from "./routes/Registration";
 import SearchPage, { Profile } from "./routes/SearchPage";
+import Verification from "./routes/Verification";
 
 function App() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -26,31 +31,31 @@ function App() {
   }, []);
 
   return (
-    <>
+    <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<OutletPage />} key="route-base">
-            <Route index element={<Landing />} key="route-index" />
-            <Route path="/register" element={<Registration />} />
-            <Route
-              path="/profile/:userId"
-              element={<ProfilePage />}
-              key={`route-profile`}
-            />
-            <Route
-              path="/create-post"
-              element={<CreatePost />}
-              key="route-create-post"
-            />
-            <Route path="/feed" element={<FeedPage />} />
-            <Route
-              path="/search"
-              element={<SearchPage profiles={profiles} />}
-            />
+          {/* Public routes */}
+
+          <Route index element={<Landing />} />
+          <Route path="/register" element={<Registration />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/verify" element={<Verification />} />
+
+          {/* Protected routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/" element={<OutletPage />}>
+              <Route path="/profile/:userId" element={<ProfilePage />} />
+              <Route path="/create-post" element={<CreatePost />} />
+              <Route path="/feed" element={<FeedPage />} />
+              <Route
+                path="/search"
+                element={<SearchPage profiles={profiles} />}
+              />
+            </Route>
           </Route>
         </Routes>
       </BrowserRouter>
-    </>
+    </AuthProvider>
   );
 }
 
