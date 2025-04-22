@@ -3,6 +3,7 @@ import { Researcher, SocialLinks } from "./types";
 
 export const PROFILE_API_ENDPOINT = "http://localhost:5001/api/profiles";
 export const POST_API_ENDPOINT = "http://localhost:5001/api/posts";
+export const API_ENDPOINT = "http://localhost:5001/api";
 
 export const emptyResearcher: Researcher = {
   firstName: "n/a",

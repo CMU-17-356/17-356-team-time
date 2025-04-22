@@ -7,6 +7,7 @@ import React, {
   ReactNode,
 } from "react";
 import axios from "axios";
+import { API_ENDPOINT } from "../consts";
 
 interface User {
   username: string;
@@ -38,7 +39,7 @@ interface SignupData {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const API_URL = "http://localhost:5001/api";
+const API_URL = API_ENDPOINT;
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
@@ -109,7 +110,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         };
 
         // Save to localStorage
-        localStorage.setItem("authToken", response.data.accessToken);
         localStorage.setItem("userData", JSON.stringify(userData));
 
         setUser(userData);
@@ -137,7 +137,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       );
 
       // Clear localStorage
-      localStorage.removeItem("authToken");
       localStorage.removeItem("userData");
       setUser(null);
 
