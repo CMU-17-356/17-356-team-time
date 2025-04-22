@@ -82,20 +82,6 @@ const Verification: React.FC = () => {
 
           {error && <p className="text-red-500 mt-2">{error}</p>}
         </form>
-
-        <p className="mt-4 text-sm text-gray-600">
-          Didn't receive a code? Check your spam folder or{" "}
-          <button
-            className="text-[#faab99] hover:underline"
-            onClick={() => {
-              // You would implement this to resend the code
-              alert("This feature is not implemented yet.");
-            }}
-          >
-            request a new one
-          </button>
-          .
-        </p>
       </div>
     </div>
   );
