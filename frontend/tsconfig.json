@@ -6,6 +6,6 @@
   ],
   "compilerOptions": {
     "esModuleInterop": true,
-    "jsx": "react-jsx" // or "react-native"
+    "jsx": "react-jsx" // or "react" if only building front end
   }
 }

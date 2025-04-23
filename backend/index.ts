@@ -1,8 +1,9 @@
-import express, { Express } from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
-import profileRouter from "./routes/profile";
+import express, { Express } from "express";
 import postsRouter from "./routes/posts";
+import profileRouter from "./routes/profile";
+import profileImageRouter from "./routes/profilesImages";
 
 const app: Express = express();
 const PORT: number = 5001;
@@ -20,6 +21,8 @@ app.use(bodyParser.json());
 app.use("/api/profiles", profileRouter);
 // Mount posts routes
 app.use("/api/posts", postsRouter);
+// Mount profile image routes
+app.use("/api/imgs", profileImageRouter);
 
 // Start server
 if (require.main === module) {

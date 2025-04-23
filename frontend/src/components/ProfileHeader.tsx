@@ -1,6 +1,5 @@
 import axios from "axios";
 import {
-  Camera,
   Check,
   Github,
   Globe,
@@ -17,10 +16,11 @@ import React, { useRef, useState } from "react";
 import { PROFILE_API_ENDPOINT } from "../consts";
 import { Profile, ProfileHeaderProps } from "../types";
 import { ProfileInterests } from "./ProfileInterests";
+import ProfileImageUploader from "./ProfileUpload";
 
 export const ProfileHeader = (props: ProfileHeaderProps) => {
   const [showMenu, setShowMenu] = useState(false);
-  const [profileHover, setProfileHover] = useState(false);
+  // const [profileHover, setProfileHover] = useState(false);
   const [showImageUpload, setShowImageUpload] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isFollowing, setisFollowing] = useState(props.isFollowing);
@@ -157,26 +157,7 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <div className="flex flex-col md:flex-row items-center">
           {/* Profile Picture */}
-          <div className="mb-4 md:mb-0 md:mr-6">
-            <div
-              className="w-32 h-32 rounded-full overflow-hidden relative"
-              onMouseEnter={() => isEditing && setProfileHover(true)}
-              onMouseLeave={() => setProfileHover(false)}
-              onClick={() => isEditing && setShowImageUpload(true)}
-              data-testid="profile-picture-id"
-            >
-              <img
-                src={props.profilePicture}
-                alt={`${props.firstName} ${props.lastName}'s profile`}
-                className="w-full h-full object-cover"
-              />
-              {isEditing && profileHover && (
-                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center cursor-pointer">
-                  <Camera size={24} color="white" />
-                </div>
-              )}
-            </div>
-          </div>
+          <ProfileImageUploader userId={props.userId} isEditing={isEditing} />
 
           {/* Profile Info */}
           <div className="flex-1 text-center md:text-left">
