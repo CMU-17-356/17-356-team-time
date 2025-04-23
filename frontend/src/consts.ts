@@ -5,6 +5,8 @@ export const PROFILE_API_ENDPOINT = "http://localhost:5001/api/profiles";
 export const POST_API_ENDPOINT = "http://localhost:5001/api/posts";
 export const PROFILE_IMG_ENDPOINT = "http://localhost:5001/api/imgs";
 
+export const PROFILE_IMAGE_NAME = "profile.png";
+
 export const emptyResearcher: Researcher = {
   firstName: "n/a",
   lastName: "n/a",

@@ -1,58 +1,33 @@
 // frontend/src/components/SingleImageUploader.tsx
-import axios from "axios";
 import { Camera } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
-import { PROFILE_IMG_ENDPOINT } from "../consts";
+import React, { useRef, useState } from "react";
 import ImageCropper from "./ImageCropper";
 
 interface SingleImageUploaderProps {
-  userId: string;
   isEditing: boolean;
+  currentImage: string | null;
+  uploadProgress: number;
+  setCurrentImage: (image: string | null) => void;
+  setBlob: (blob: Blob) => void;
 }
 
 const ProfileImageUploader: React.FC<SingleImageUploaderProps> = ({
-  userId,
   isEditing,
+  currentImage,
+  uploadProgress,
+  setCurrentImage,
+  setBlob,
 }) => {
-  const [currentImage, setCurrentImage] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [profileHover, setProfileHover] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [showCropper, setShowCropper] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const PROFILE_IMAGE_NAME = "profile.png";
-
   // Trigger file input click
   const openFileSelector = () => {
     fileInputRef.current?.click();
-  };
-
-  useEffect(() => {
-    fetchCurrentImage();
-  }, [userId]);
-
-  const fetchCurrentImage = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get(`${PROFILE_IMG_ENDPOINT}/${userId}`);
-      const imageUrl = response.data;
-
-      if (imageUrl) {
-        setCurrentImage(imageUrl.url);
-      } else {
-        setCurrentImage(null);
-      }
-
-      setError(null);
-    } catch (err) {
-      console.error("Error fetching image:", err);
-    } finally {
-      setLoading(false);
-    }
   };
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,84 +44,6 @@ const ProfileImageUploader: React.FC<SingleImageUploaderProps> = ({
       setSelectedFile(file);
       setShowCropper(true);
       setError(null);
-    }
-  };
-
-  const handleCropComplete = async (croppedBlob: Blob) => {
-    if (!croppedBlob) {
-      setError("Failed to crop image");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setUploadProgress(0);
-      setShowCropper(false);
-
-      // Create a new file from the blob with a consistent filename
-      const pngFile = new File([croppedBlob], PROFILE_IMAGE_NAME, {
-        type: "image/png",
-      });
-
-      const formData = new FormData();
-      formData.append("image", pngFile);
-
-      // Check if we should update or create
-      if (currentImage) {
-        // Update existing image
-        await axios.put(`${PROFILE_IMG_ENDPOINT}/${userId}`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-          onUploadProgress: (progressEvent) => {
-            const progress = progressEvent.total
-              ? Math.round((progressEvent.loaded * 100) / progressEvent.total)
-              : 0;
-            setUploadProgress(progress);
-          },
-        });
-      } else {
-        // Upload new image
-        await axios.post(`${PROFILE_IMG_ENDPOINT}/${userId}`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-          onUploadProgress: (progressEvent) => {
-            const progress = progressEvent.total
-              ? Math.round((progressEvent.loaded * 100) / progressEvent.total)
-              : 0;
-            setUploadProgress(progress);
-          },
-        });
-      }
-
-      setSelectedFile(null);
-      setUploadProgress(0);
-      await fetchCurrentImage();
-    } catch (err) {
-      setError("Failed to upload image");
-      console.error("Error uploading image:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDelete = async () => {
-    try {
-      if (
-        !window.confirm("Are you sure you want to delete your profile image?")
-      ) {
-        return;
-      }
-
-      setLoading(true);
-      await axios.delete(`${PROFILE_IMG_ENDPOINT}/${userId}`);
-      setCurrentImage(null);
-    } catch (err) {
-      setError("Failed to delete image");
-      console.error("Error deleting image:", err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -184,7 +81,7 @@ const ProfileImageUploader: React.FC<SingleImageUploaderProps> = ({
                 isEditing ? "mt-4 flex justify-center gap-4" : "hidden"
               }
             >
-              <label className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 cursor-pointer">
+              {/* <label className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 cursor-pointer">
                 Replace
                 <input
                   type="file"
@@ -192,9 +89,9 @@ const ProfileImageUploader: React.FC<SingleImageUploaderProps> = ({
                   accept="image/*"
                   onChange={handleFileSelect}
                 />
-              </label>
+              </label> */}
               <button
-                onClick={handleDelete}
+                onClick={() => setCurrentImage(null)}
                 className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
               >
                 Delete
@@ -244,14 +141,14 @@ const ProfileImageUploader: React.FC<SingleImageUploaderProps> = ({
         </div>
       )}
 
-      {loading && !uploadProgress && (
-        <div className="mt-4 text-center text-gray-600">Loading...</div>
-      )}
-
       {showCropper && selectedFile && (
         <ImageCropper
           file={selectedFile}
-          onCropComplete={handleCropComplete}
+          onCropComplete={(imageBlob: Blob) => {
+            setShowCropper(false);
+            setCurrentImage(URL.createObjectURL(imageBlob));
+            setBlob(imageBlob);
+          }}
           onCancel={() => {
             setShowCropper(false);
             setSelectedFile(null);
