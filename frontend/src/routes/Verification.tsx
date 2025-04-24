@@ -44,7 +44,7 @@ const Verification: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#CCE2F5]">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#ffffff]">
       <div className="bg-white p-8 rounded-2xl shadow-lg w-96 text-center">
         <h2 className="text-2xl font-bold mb-4">Verify Your Account</h2>
         <p className="mb-4 text-gray-600">

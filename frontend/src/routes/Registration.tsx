@@ -69,7 +69,7 @@ const Registration: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#CCE2F5]">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#ffffff]">
       <div className="p-8 rounded-2xl w-96 text-center">
         <h2 className="text-2xl font-bold mb-4">User Registration</h2>
         {registrationSuccess ? (

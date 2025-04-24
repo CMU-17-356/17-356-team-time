@@ -21,7 +21,7 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#CCE2F5]">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#ffffff]">
       <img
         src="/reach_full_logo.png"
         alt="Reach logo"

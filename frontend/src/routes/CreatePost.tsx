@@ -129,7 +129,7 @@ const CreatePost: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#CCE2F5]">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#ffffff]">
       <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-2xl text-center">
         <h2 className="text-2xl font-bold mb-4">Create New Post</h2>
 
