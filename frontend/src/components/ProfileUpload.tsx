@@ -81,20 +81,11 @@ const ProfileImageUploader: React.FC<SingleImageUploaderProps> = ({
                 isEditing ? "mt-4 flex justify-center gap-4" : "hidden"
               }
             >
-              {/* <label className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 cursor-pointer">
-                Replace
-                <input
-                  type="file"
-                  className="hidden"
-                  accept="image/*"
-                  onChange={handleFileSelect}
-                />
-              </label> */}
               <button
                 onClick={() => setCurrentImage(null)}
-                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
               >
-                Delete
+                Delete Image
               </button>
             </div>
           </div>
