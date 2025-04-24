@@ -49,6 +49,7 @@ export interface Post {
   commentCount: number;
   createdAt: string;
   updatedAt: string;
+  liked?: boolean;
 }
 
 export interface PostFeedProps {
