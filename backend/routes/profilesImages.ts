@@ -20,13 +20,6 @@ interface S3UploadParams {
   ACL?: string;
 }
 
-interface ImageFileInfo {
-  key: string;
-  fileName: string;
-  size: number;
-  url: string;
-}
-
 interface CustomError extends Error {
   statusCode?: number;
 }
