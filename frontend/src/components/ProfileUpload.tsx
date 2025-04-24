@@ -21,7 +21,7 @@ const ProfileImageUploader: React.FC<SingleImageUploaderProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [profileHover, setProfileHover] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [showCropper, setShowCropper] = useState(false);
+  // const [showCropper, setShowCropper] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -42,7 +42,7 @@ const ProfileImageUploader: React.FC<SingleImageUploaderProps> = ({
         return;
       }
       setSelectedFile(file);
-      setShowCropper(true);
+      // setShowCropper(true);
       setError(null);
     }
   };
@@ -68,7 +68,7 @@ const ProfileImageUploader: React.FC<SingleImageUploaderProps> = ({
               <img
                 src={currentImage}
                 alt="Profile"
-                className="w-48 h-48 object-cover mx-auto rounded-full border-4 border-white shadow-lg"
+                className="w-full h-full object-cover mx-auto border-4 border-white shadow-lg"
               />
               {isEditing && profileHover && (
                 <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center cursor-pointer">
@@ -141,16 +141,16 @@ const ProfileImageUploader: React.FC<SingleImageUploaderProps> = ({
         </div>
       )}
 
-      {showCropper && selectedFile && (
+      {selectedFile && (
         <ImageCropper
           file={selectedFile}
           onCropComplete={(imageBlob: Blob) => {
-            setShowCropper(false);
-            setCurrentImage(URL.createObjectURL(imageBlob));
+            // setShowCropper(false);
             setBlob(imageBlob);
+            setSelectedFile(null);
           }}
           onCancel={() => {
-            setShowCropper(false);
+            // setShowCropper(false);
             setSelectedFile(null);
           }}
         />
