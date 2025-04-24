@@ -21,6 +21,7 @@ const createTestComponent = (overrideProps = {}) => {
     followers: 20,
     email: "test@test.com",
     isFollowing: false,
+    isOwnProfile: true,
     socials: {
       twitter: "https://twitter.com/test",
       github: "https://github.com/test",

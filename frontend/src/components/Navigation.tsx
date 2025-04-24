@@ -1,6 +1,7 @@
-import { Bell, Home, Plus, Search, User } from "lucide-react";
+import { Home, LogOut, Plus, Search, User } from "lucide-react";
 import { JSX } from "react";
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 interface NavItemProps {
   icon: JSX.Element;
@@ -24,10 +25,53 @@ const NavItem = (props: NavItemProps) => {
   );
 };
 
-export const NavigationBar = ({ user }: { user: string }) => {
+export const NavigationBar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, isAuthenticated, signout } = useAuth();
+
   const showCreateButton = location.pathname !== "/create-post";
 
+  const handleSignout = async () => {
+    try {
+      await signout();
+      navigate("/");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
+  // If not authenticated, show login/register buttons
+  if (!isAuthenticated) {
+    return (
+      <nav className="bg-white shadow-md w-full flex justify-between items-center px-4 fixed bottom-0 left-0 z-10">
+        <div className="flex-1 flex justify-between items-center max-w-4xl mx-auto">
+          <NavItem
+            icon={<Home size={24} />}
+            to="/"
+            isActive={location.pathname === "/"}
+          />
+
+          <NavItem
+            icon={<User size={24} />}
+            to="/login"
+            isActive={location.pathname === "/login"}
+          />
+
+          <Link
+            to="/register"
+            className="flex flex-col items-center justify-center py-2 px-4"
+          >
+            <div className="bg-blue-600 rounded-full p-3 text-white">
+              <Plus size={24} />
+            </div>
+          </Link>
+        </div>
+      </nav>
+    );
+  }
+
+  // If authenticated, show normal nav with sign-out option
   return (
     <nav className="bg-white shadow-md w-full flex justify-between items-center px-4 fixed bottom-0 left-0 z-10">
       <div className="flex-1 flex justify-between items-center max-w-4xl mx-auto">
@@ -55,16 +99,19 @@ export const NavigationBar = ({ user }: { user: string }) => {
         )}
 
         <NavItem
-          icon={<Bell size={24} />}
-          to="/notifications"
-          isActive={location.pathname === "/notifications"}
+          icon={<User size={24} />}
+          to={`/profile/${user?.username || ""}`}
+          isActive={location.pathname.startsWith("/profile")}
         />
 
-        <NavItem
-          icon={<User size={24} />}
-          to={`/profile/${user}`}
-          isActive={location.pathname === `/profile/${user}`}
-        />
+        <button
+          onClick={handleSignout}
+          className="flex flex-col items-center justify-center py-2 px-4 text-gray-600 hover:text-blue-500"
+        >
+          <div className="flex items-center justify-center">
+            <LogOut size={24} />
+          </div>
+        </button>
       </div>
     </nav>
   );

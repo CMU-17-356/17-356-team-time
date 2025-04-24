@@ -23,6 +23,7 @@ export interface Researcher extends Profile {
   following: number; // todo
   followers: number; // todo
   socials: SocialLinks; // todo
+  isOwnProfile?: boolean; // Whether the profile being viewed belongs to the current user
 }
 
 export interface SocialLinks {

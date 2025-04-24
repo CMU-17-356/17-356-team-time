@@ -129,6 +129,7 @@ export const ResearcherProfile = (props: Researcher) => {
     ...researcher,
     isFollowing: false, // Placeholder for follow state
     setResearcher,
+    isOwnProfile: props.isOwnProfile,
   };
 
   return (

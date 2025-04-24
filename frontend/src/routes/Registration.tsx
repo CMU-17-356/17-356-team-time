@@ -1,9 +1,12 @@
-// tailwind docs: https://v2.tailwindcss.com/docs/
-import axios from "axios";
+// src/routes/Registration.tsx
 import React, { useState } from "react";
-import { PROFILE_API_ENDPOINT } from "../consts";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
-const UserRegistration: React.FC = () => {
+const Registration: React.FC = () => {
+  const navigate = useNavigate();
+  const { signup, error, loading } = useAuth();
+
   const [formData, setFormData] = useState({
     userId: "",
     firstName: "",
@@ -18,9 +21,15 @@ const UserRegistration: React.FC = () => {
   });
 
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
+  const [userIdExists, setUserIdExists] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+
+    // Reset the userIdExists error when userId changes
+    if (e.target.name === "userId") {
+      setUserIdExists(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -29,24 +38,33 @@ const UserRegistration: React.FC = () => {
       alert("Passwords do not match!");
       return;
     }
+
     try {
-      const res = await axios.post(PROFILE_API_ENDPOINT, {
+      // Use the signup method from our auth context
+      await signup({
         userId: formData.userId,
+        password: formData.password,
+        email: formData.email,
         firstName: formData.firstName,
         lastName: formData.lastName,
-        email: formData.email,
         phone: formData.phone,
         institution: formData.institution,
         fieldOfInterest: formData.fieldOfInterest,
         bio: formData.bio,
       });
 
-      alert("Registration Successful!");
-      console.log("User Created:", res.data);
+      // Instead of alert, show a success message in the UI
       setRegistrationSuccess(true);
-    } catch (error) {
+
+      // Redirect to verification page and pass the username
+      navigate("/verify", { state: { username: formData.userId } });
+    } catch (error: any) {
       console.error("Error registering user:", error);
-      alert("Registration failed. Try again.");
+
+      // Handle specific error for existing user
+      if (error.message && error.message.includes("already exists")) {
+        setUserIdExists(true);
+      }
     }
   };
 
@@ -60,14 +78,22 @@ const UserRegistration: React.FC = () => {
           </p>
         ) : (
           <form onSubmit={handleSubmit} className="w-full">
-            <input
-              type="text"
-              name="userId"
-              placeholder="User ID"
-              className="w-full p-2 border rounded mb-2"
-              onChange={handleChange}
-              required
-            />
+            <div className="mb-2">
+              <input
+                type="text"
+                name="userId"
+                placeholder="User ID (for login)"
+                className={`w-full p-2 border rounded ${userIdExists ? "border-red-500" : ""}`}
+                onChange={handleChange}
+                required
+              />
+              {userIdExists && (
+                <p className="text-red-500 text-xs text-left mt-1">
+                  This User ID already exists. Please choose another.
+                </p>
+              )}
+            </div>
+
             <input
               type="text"
               name="firstName"
@@ -143,9 +169,14 @@ const UserRegistration: React.FC = () => {
             <button
               type="submit"
               className="w-full bg-[#faab99] text-white py-2 rounded hover:bg-[#f89686]"
+              disabled={loading}
             >
-              Register
+              {loading ? "Registering..." : "Register"}
             </button>
+
+            {error && !userIdExists && (
+              <p className="text-red-500 mt-2">{error}</p>
+            )}
           </form>
         )}
       </div>
@@ -153,4 +184,4 @@ const UserRegistration: React.FC = () => {
   );
 };
 
-export default UserRegistration;
+export default Registration;
