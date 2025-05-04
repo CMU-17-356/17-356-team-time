@@ -28,7 +28,9 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
   const [showImageUpload, setShowImageUpload] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isFollowing, setisFollowing] = useState(props.isFollowing);
-  const [currentImage, setCurrentImage] = useState<string | null>(null);
+  const [currentImage, setCurrentImage] = useState<string | undefined>(
+    undefined,
+  );
   const [uploadProgress, setUploadProgress] = useState(0);
   const [imageBlob, setImageBlob] = useState<Blob | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -141,10 +143,11 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
       );
       const imageUrl = response.data;
 
-      if (imageUrl) {
+      const valid = await checkImage(imageUrl.url);
+      if (valid) {
         setCurrentImage(imageUrl.url);
       } else {
-        setCurrentImage(null);
+        setCurrentImage(undefined);
       }
     } catch (err) {
       console.error("Error fetching image:", err);
@@ -185,10 +188,10 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
         console.log(error);
       });
 
-    if (currentImage === null) {
-      handleDeleteImage();
-    } else if (imageBlob) {
+    if (imageBlob) {
       handleUploadImage();
+    } else if (currentImage === undefined) {
+      handleDeleteImage();
     }
     setIsEditing(false);
   };
@@ -230,18 +233,11 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
     });
   };
 
-  // Handle profile picture upload
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // TODO: upload the file to a server here
-      // hack: placeholder and simulate a successful upload
-      props.setResearcher({
-        ...props,
-        profilePicture: "/api/placeholder/200/200",
-      });
-      setShowImageUpload(false);
-    }
+  const checkImage = async (url: string) => {
+    const res = await fetch(url);
+    const buff = await res.blob();
+
+    return buff.type.startsWith("image/");
   };
 
   // Trigger file input click
@@ -250,9 +246,13 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
   };
 
   // Update tempBio and tempInterests when researcher data changes or edit mode is entered
-  React.useEffect(() => {
+  useEffect(() => {
     setTempBio(props.bio);
   }, [props.bio, isEditing]);
+
+  // useEffect(() => {
+  //   fetchCurrentImage();
+  // }, []);
 
   return (
     <div>
@@ -330,6 +330,7 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
                   <button
                     onClick={handleCancelEdit}
                     className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+                    data-testid="cancel-edit-button"
                   >
                     Cancel
                   </button>
@@ -500,15 +501,6 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
           )}
         </div>
       </div>
-
-      {/* Hidden file input for image upload */}
-      <input
-        type="file"
-        ref={fileInputRef}
-        className="hidden"
-        accept="image/*"
-        onChange={handleFileChange}
-      />
 
       {/* Delete Confirmation popup */}
       {showDeleteConfirm && (

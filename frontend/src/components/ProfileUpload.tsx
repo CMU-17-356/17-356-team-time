@@ -5,9 +5,9 @@ import ImageCropper from "./ImageCropper";
 
 interface SingleImageUploaderProps {
   isEditing: boolean;
-  currentImage: string | null;
+  currentImage: string | undefined;
   uploadProgress: number;
-  setCurrentImage: (image: string | null) => void;
+  setCurrentImage: (image: string | undefined) => void;
   setBlob: (blob: Blob) => void;
 }
 
@@ -21,9 +21,14 @@ const ProfileImageUploader: React.FC<SingleImageUploaderProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [profileHover, setProfileHover] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  // const [showCropper, setShowCropper] = useState(false);
+  const [tempCropImg, setTempCropImg] = useState<string | undefined>(undefined);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // cleanup
+  if (!isEditing && tempCropImg !== undefined) {
+    setTempCropImg(undefined);
+  }
 
   // Trigger file input click
   const openFileSelector = () => {
@@ -47,6 +52,8 @@ const ProfileImageUploader: React.FC<SingleImageUploaderProps> = ({
     }
   };
 
+  console.log(isEditing, tempCropImg, currentImage);
+
   return (
     <div className="max-w-md mx-auto p-4">
       {error && (
@@ -56,7 +63,7 @@ const ProfileImageUploader: React.FC<SingleImageUploaderProps> = ({
       )}
 
       <div className="text-center">
-        {currentImage ? (
+        {currentImage !== undefined || tempCropImg !== undefined ? (
           <div className="relative">
             <div
               className="w-48 h-48 rounded-full overflow-hidden relative"
@@ -66,9 +73,9 @@ const ProfileImageUploader: React.FC<SingleImageUploaderProps> = ({
               data-testid="profile-picture-id"
             >
               <img
-                src={currentImage}
+                src={isEditing && tempCropImg ? tempCropImg : currentImage}
                 alt="Profile"
-                className="w-full h-full object-cover mx-auto border-4 border-white shadow-lg"
+                className="w-48 h-48 object-cover mx-auto shadow-lg"
               />
               {isEditing && profileHover && (
                 <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center cursor-pointer">
@@ -82,7 +89,7 @@ const ProfileImageUploader: React.FC<SingleImageUploaderProps> = ({
               }
             >
               <button
-                onClick={() => setCurrentImage(null)}
+                onClick={() => setCurrentImage(undefined)}
                 className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
               >
                 Delete Image
@@ -106,17 +113,19 @@ const ProfileImageUploader: React.FC<SingleImageUploaderProps> = ({
                 />
               </svg>
             </div>
-            <label className="block">
-              <span className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 cursor-pointer inline-block">
-                Upload Image
-              </span>
-              <input
-                type="file"
-                className="hidden"
-                accept="image/*"
-                onChange={handleFileSelect}
-              />
-            </label>
+            {isEditing && (
+              <label className="block">
+                <span className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 cursor-pointer inline-block">
+                  Upload Image
+                </span>
+                <input
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                />
+              </label>
+            )}
           </div>
         )}
       </div>
@@ -135,14 +144,16 @@ const ProfileImageUploader: React.FC<SingleImageUploaderProps> = ({
       {selectedFile && (
         <ImageCropper
           file={selectedFile}
-          onCropComplete={(imageBlob: Blob) => {
+          onCropComplete={(imageBlob: Blob, tempImg: string) => {
             // setShowCropper(false);
             setBlob(imageBlob);
+            setTempCropImg(tempImg);
             setSelectedFile(null);
           }}
           onCancel={() => {
             // setShowCropper(false);
             setSelectedFile(null);
+            setTempCropImg(undefined);
           }}
         />
       )}

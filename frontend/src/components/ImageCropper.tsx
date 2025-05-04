@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 
 interface ImageCropperProps {
   file: File;
-  onCropComplete: (croppedBlob: Blob) => void;
+  onCropComplete: (croppedBlob: Blob, tempImg: string) => void;
   onCancel: () => void;
 }
 
@@ -117,11 +117,13 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
       outputSize,
     );
 
+    const tempImg = canvas.toDataURL("image/png");
+
     // Convert to PNG blob
     canvas.toBlob(
       (blob) => {
         if (blob) {
-          onCropComplete(blob);
+          onCropComplete(blob, tempImg);
         }
       },
       "image/png",

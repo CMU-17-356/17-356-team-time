@@ -73,7 +73,7 @@ export const NavigationBar = () => {
 
   // If authenticated, show normal nav with sign-out option
   return (
-    <nav className="bg-white shadow-md w-full flex justify-between items-center px-4 fixed bottom-0 left-0 z-10">
+    <nav className="bg-white shadow-md w-full flex justify-between items-center px-4 fixed bottom-0 left-0 z-10 border-slate-300 border-t-2">
       <div className="flex-1 flex justify-between items-center max-w-4xl mx-auto">
         <NavItem
           icon={<Home size={24} />}
