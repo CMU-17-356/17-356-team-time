@@ -1,12 +1,13 @@
-import express, { Express, Request, Response, NextFunction } from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
-import session from "express-session";
 import dotenv from "dotenv";
-import profileRouter from "./routes/profile";
-import postsRouter from "./routes/posts";
-import authRouter from "./routes/auth";
+import express, { Express, NextFunction, Request, Response } from "express";
+import session from "express-session";
 import { initializeCognito } from "./config/cognito";
+import authRouter from "./routes/auth";
+import postsRouter from "./routes/posts";
+import profileRouter from "./routes/profile";
+import profileImageRouter from "./routes/profilesImages";
 
 dotenv.config();
 
@@ -53,6 +54,7 @@ initializeCognito()
     app.use("/api/profiles", profileRouter);
     app.use("/api/posts", postsRouter);
     app.use("/api/auth", authRouter);
+    app.use("/api/imgs", profileImageRouter);
 
     // Start server
     if (require.main === module) {

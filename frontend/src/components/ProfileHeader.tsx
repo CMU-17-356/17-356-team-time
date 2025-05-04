@@ -1,6 +1,5 @@
 import axios from "axios";
 import {
-  Camera,
   Check,
   Github,
   Globe,
@@ -13,17 +12,25 @@ import {
   UserPlus,
   X,
 } from "lucide-react";
-import React, { useRef, useState } from "react";
-import { PROFILE_API_ENDPOINT } from "../consts";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  PROFILE_API_ENDPOINT,
+  PROFILE_IMAGE_NAME,
+  PROFILE_IMG_ENDPOINT,
+} from "../consts";
 import { Profile, ProfileHeaderProps } from "../types";
 import { ProfileInterests } from "./ProfileInterests";
+import ProfileImageUploader from "./ProfileUpload";
 
 export const ProfileHeader = (props: ProfileHeaderProps) => {
   const [showMenu, setShowMenu] = useState(false);
-  const [profileHover, setProfileHover] = useState(false);
+  // const [profileHover, setProfileHover] = useState(false);
   const [showImageUpload, setShowImageUpload] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isFollowing, setisFollowing] = useState(props.isFollowing);
+  const [currentImage, setCurrentImage] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [imageBlob, setImageBlob] = useState<Blob | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [tempBio, setTempBio] = useState(props.bio);
   const [tempInterests, setTempInterests] = useState(
@@ -54,6 +61,95 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
     lastName: props.lastName,
     affiliation: props.institution,
   });
+
+  // dealing with uploading/deleting images from S3
+  const handleUploadImage = async () => {
+    if (!imageBlob) {
+      return;
+    }
+
+    try {
+      setUploadProgress(0);
+
+      // Create a new file from the blob with a consistent filename
+      const pngFile = new File([imageBlob], PROFILE_IMAGE_NAME, {
+        type: "image/png",
+      });
+
+      const formData = new FormData();
+      formData.append("image", pngFile);
+
+      // Check if we should update or create
+      if (currentImage) {
+        // Update existing image
+        await axios.put(`${PROFILE_IMG_ENDPOINT}/${props.userId}`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          onUploadProgress: (progressEvent) => {
+            const progress = progressEvent.total
+              ? Math.round((progressEvent.loaded * 100) / progressEvent.total)
+              : 0;
+            setUploadProgress(progress);
+          },
+        });
+      } else {
+        // Upload new image
+        await axios.post(`${PROFILE_IMG_ENDPOINT}/${props.userId}`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          onUploadProgress: (progressEvent) => {
+            const progress = progressEvent.total
+              ? Math.round((progressEvent.loaded * 100) / progressEvent.total)
+              : 0;
+            setUploadProgress(progress);
+          },
+        });
+      }
+
+      setImageBlob(null);
+      setUploadProgress(0);
+      await fetchCurrentImage();
+    } catch (err) {
+      console.error("Error uploading image:", err);
+    }
+  };
+
+  const handleDeleteImage = async () => {
+    try {
+      if (
+        !window.confirm("Are you sure you want to delete your profile image?")
+      ) {
+        return;
+      }
+
+      await axios.delete(`${PROFILE_IMG_ENDPOINT}/${props.userId}`);
+    } catch (err) {
+      console.error("Error deleting image:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchCurrentImage();
+  }, [props.userId]);
+
+  const fetchCurrentImage = async () => {
+    try {
+      const response = await axios.get(
+        `${PROFILE_IMG_ENDPOINT}/${props.userId}`,
+      );
+      const imageUrl = response.data;
+
+      if (imageUrl) {
+        setCurrentImage(imageUrl.url);
+      } else {
+        setCurrentImage(null);
+      }
+    } catch (err) {
+      console.error("Error fetching image:", err);
+    }
+  };
 
   // Handle bio change
   const handleBioChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -88,17 +184,24 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
       .catch((error: any) => {
         console.log(error);
       });
+
+    if (currentImage === null) {
+      handleDeleteImage();
+    } else if (imageBlob) {
+      handleUploadImage();
+    }
     setIsEditing(false);
   };
 
   // Cancel editing
-  const handleCancelEdit = () => {
+  const handleCancelEdit = async () => {
     setEditFormData({
       firstName: props.firstName,
       lastName: props.lastName,
       affiliation: props.institution,
     });
     setTempInterests(props.fieldOfInterest || "");
+    await fetchCurrentImage();
     setIsEditing(false);
   };
 
@@ -157,26 +260,13 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <div className="flex flex-col md:flex-row items-center">
           {/* Profile Picture */}
-          <div className="mb-4 md:mb-0 md:mr-6">
-            <div
-              className="w-32 h-32 rounded-full overflow-hidden relative"
-              onMouseEnter={() => isEditing && setProfileHover(true)}
-              onMouseLeave={() => setProfileHover(false)}
-              onClick={() => isEditing && setShowImageUpload(true)}
-              data-testid="profile-picture-id"
-            >
-              <img
-                src={props.profilePicture}
-                alt={`${props.firstName} ${props.lastName}'s profile`}
-                className="w-full h-full object-cover"
-              />
-              {isEditing && profileHover && (
-                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center cursor-pointer">
-                  <Camera size={24} color="white" />
-                </div>
-              )}
-            </div>
-          </div>
+          <ProfileImageUploader
+            isEditing={isEditing}
+            currentImage={currentImage}
+            setCurrentImage={setCurrentImage}
+            setBlob={setImageBlob}
+            uploadProgress={uploadProgress}
+          />
 
           {/* Profile Info */}
           <div className="flex-1 text-center md:text-left">

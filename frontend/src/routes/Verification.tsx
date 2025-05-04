@@ -44,7 +44,7 @@ const Verification: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#fce6d2]">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#ffffff]">
       <div className="bg-white p-8 rounded-2xl shadow-lg w-96 text-center">
         <h2 className="text-2xl font-bold mb-4">Verify Your Account</h2>
         <p className="mb-4 text-gray-600">
@@ -74,7 +74,7 @@ const Verification: React.FC = () => {
 
           <button
             type="submit"
-            className="w-full bg-[#faab99] text-white py-2 rounded hover:bg-[#f89686]"
+            className="w-full bg-[#A9CEEF] text-white py-2 rounded hover:bg-[#86BBE9]"
             disabled={loading}
           >
             {loading ? "Verifying..." : "Verify Account"}

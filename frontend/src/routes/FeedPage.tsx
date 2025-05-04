@@ -30,8 +30,8 @@ export const FeedPage = () => {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#fce6d2]">
-      <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-2xl">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#ffffff]">
+      <div className="p-8 w-full max-w-2xl">
         <h1 className="text-2xl font-bold mb-8 text-center">Research Feed</h1>
         <PostFeed posts={posts} isLoading={isLoading} error={error} />
       </div>

@@ -69,8 +69,8 @@ const Registration: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#fce6d2]">
-      <div className="bg-white p-8 rounded-2xl shadow-lg w-96 text-center">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#ffffff]">
+      <div className="p-8 rounded-2xl w-96 text-center">
         <h2 className="text-2xl font-bold mb-4">User Registration</h2>
         {registrationSuccess ? (
           <p className="text-green-600 font-semibold">
@@ -168,7 +168,7 @@ const Registration: React.FC = () => {
             />
             <button
               type="submit"
-              className="w-full bg-[#faab99] text-white py-2 rounded hover:bg-[#f89686]"
+              className="w-full bg-[#A9CEEF] text-white py-2 rounded hover:bg-[#86BBE9]"
               disabled={loading}
             >
               {loading ? "Registering..." : "Register"}

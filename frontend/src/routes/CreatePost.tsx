@@ -129,7 +129,7 @@ const CreatePost: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#fce6d2]">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#ffffff]">
       <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-2xl text-center">
         <h2 className="text-2xl font-bold mb-4">Create New Post</h2>
 
@@ -245,7 +245,7 @@ const CreatePost: React.FC = () => {
               <button
                 type="button"
                 onClick={handleAddTag}
-                className="px-4 py-2 bg-[#faab99] text-white rounded-r hover:bg-[#f89686]"
+                className="px-4 py-2 bg-[#A9CEEF] text-white rounded-r hover:bg-[#86BBE9]"
               >
                 Add Tag
               </button>
@@ -274,7 +274,7 @@ const CreatePost: React.FC = () => {
 
           <button
             type="submit"
-            className="w-full bg-[#faab99] text-white py-2 rounded hover:bg-[#f89686]"
+            className="w-full bg-[#A9CEEF] text-white py-2 rounded hover:bg-[#86BBE9]"
             disabled={isSubmitting}
           >
             {isSubmitting ? "Publishing..." : "Publish Post"}

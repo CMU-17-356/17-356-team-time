@@ -108,18 +108,37 @@ describe("ProfileHeader Component", () => {
       });
     });
 
-    test("cancels edit mode", () => {
+    test("cancels edit mode", async () => {
+      // Set up the mock response before triggering any actions
+      mockedAxios.get.mockResolvedValue({
+        data: { url: "123/profile.png" },
+      });
+
       createTestComponent();
 
       // Open edit mode
       fireEvent.click(screen.getByTestId("hamburger-menu-button"));
       fireEvent.click(screen.getByText("Edit Profile"));
 
+      // Verify we're in edit mode by checking for edit-mode-specific elements
+      expect(screen.getByLabelText("First name")).toBeDefined();
+      expect(screen.getByLabelText("Last name")).toBeDefined();
+
       // Cancel editing
       fireEvent.click(screen.getByText("Cancel"));
 
-      // Verify back to view mode
+      // Wait for the API call that happens during cancellation
+      await waitFor(() => {
+        expect(mockedAxios.get).toHaveBeenCalledWith(
+          expect.stringContaining("/123"),
+        );
+      });
+
+      // Verify we're back in view mode by checking for view-mode elements
+      // and ensuring edit-mode elements are gone
       expect(screen.getByText("John Doe")).toBeDefined();
+      expect(screen.queryByLabelText("First name")).toBeNull();
+      expect(screen.queryByLabelText("Last name")).toBeNull();
     });
   });
 
@@ -163,21 +182,6 @@ describe("ProfileHeader Component", () => {
         );
         expect(window.open).toHaveBeenCalledWith("/");
       });
-    });
-  });
-
-  // Image Upload Tests
-  describe("Image Upload", () => {
-    test("opens file selector", () => {
-      createTestComponent();
-
-      // Hover over profile picture and click
-      fireEvent.click(screen.getByTestId("hamburger-menu-button"));
-      fireEvent.click(screen.getByText("Edit Profile"));
-      fireEvent.click(screen.getByTestId("profile-picture-id"));
-
-      // Check upload popup is visible
-      expect(screen.getByText("Update Profile Picture")).toBeDefined();
     });
   });
 

@@ -21,17 +21,21 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#fce6d2]">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#ffffff]">
+      <img
+        src="/reach_full_logo.png"
+        alt="Reach logo"
+        className="w-auto h-62 block -mb-22"
+      />
       <div className="bg-white p-8 rounded-2xl shadow-lg w-96 text-center flex flex-col gap-2">
-        <h2 className="text-2xl font-bold mb-4">Reach</h2>
         <NavLink
-          className="w-full bg-[#faab99] text-white py-2 rounded hover:bg-[#f89686] flex justify-center items-center"
+          className="w-full bg-[#A9CEEF] text-white py-2 rounded hover:bg-[#86BBE9] flex justify-center items-center"
           to="/login"
         >
           {"Login"}
         </NavLink>
         <NavLink
-          className="w-full bg-[#faab99] text-white py-2 rounded mb-2 hover:bg-[#f89686] flex justify-center items-center"
+          className="w-full bg-[#A9CEEF] text-white py-2 rounded mb-2 hover:bg-[#86BBE9] flex justify-center items-center"
           to={"/register"}
         >
           {"Register"}

@@ -1,0 +1,6 @@
+
+Logo #293577
+Background #ffffff
+Buttons #A9CEEF
+Buttons Hover #86BBE9
+Text #ffffff or #000000
