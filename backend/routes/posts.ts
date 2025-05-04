@@ -1,6 +1,6 @@
 import express, { RequestHandler } from "express";
 import dynamoDB from "../db/config/dynamodb";
-import { Post, Profile, TableNames } from "../db/schemas";
+import { Post, Profile, TableNames, Like, Comment } from "../db/schemas";
 import { v4 as uuidv4 } from "uuid";
 
 const router = express.Router();
@@ -71,6 +71,67 @@ router.post("/", (async (req, res) => {
     res.status(500).json({ error: "Could not create post: " + error });
   }
 }) as RequestHandler);
+
+router.post("/:postId/comments", async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const { userId, content } = req.body;
+
+    const commentId = uuidv4();
+
+    const comment: Comment = {
+      commentId,
+      postId,
+      userId,
+      content,
+      createdAt: new Date().toISOString(),
+    };
+
+    const params = {
+      TableName: TableNames.COMMENTS,
+      Item: comment,
+    };
+
+    await dynamoDB.put(params).promise();
+
+    const updateParams = {
+      TableName: TableNames.POSTS,
+      Key: { postId },
+      UpdateExpressicommentson: "set commentCount = commentCount + :increment",
+      ExpressionAttributeValues: {
+        ":increment": 1,
+      },
+    };
+
+    await dynamoDB.update(updateParams).promise();
+
+    res.status(201).json({ message: "Comment added successfully", comment });
+  } catch (error) {
+    console.error("Error adding comment:", error);
+    res.status(500).json({ error: "Could not add comment" });
+  }
+});
+
+router.get("/:postId/comments", async (req, res) => {
+  try {
+    const { postId } = req.params;
+
+    const params = {
+      TableName: TableNames.COMMENTS,
+      KeyConditionExpression: "postId = :postId",
+      ExpressionAttributeValues: {
+        ":postId": postId,
+      },
+    };
+
+    const result = await dynamoDB.query(params).promise();
+
+    res.status(200).json({ comments: result.Items });
+  } catch (error) {
+    console.error("Error fetching comments:", error);
+    res.status(500).json({ error: "Could not fetch comments" });
+  }
+});
 
 router.get("/:postId", (async (req, res) => {
   try {
@@ -164,5 +225,73 @@ router.get("/", (async (req, res) => {
     res.status(500).json({ error: "Could not fetch posts" });
   }
 }) as RequestHandler);
+
+// Like a post
+router.post("/like", (async (req, res) => {
+  try {
+    const { postId, userId } = req.body;
+
+    // Check if the user already liked the post
+    const checkParams = {
+      TableName: TableNames.LIKES,
+      Key: { userId, postId },
+    };
+    const existingLike = await dynamoDB.get(checkParams).promise();
+
+    if (existingLike.Item) {
+      return res.status(400).json({ error: "Post already liked" });
+    }
+
+    const like: Like = {
+      userId,
+      postId,
+      createdAt: new Date().toISOString(),
+    };
+
+    const params = {
+      TableName: TableNames.LIKES,
+      Item: like,
+    };
+
+    await dynamoDB.put(params).promise();
+
+    const updateParams = {
+      TableName: TableNames.POSTS,
+      Key: { postId },
+      UpdateExpression: "set likeCount = likeCount + :increment",
+      ExpressionAttributeValues: {
+        ":increment": 1,
+      },
+    };
+
+    await dynamoDB.update(updateParams).promise();
+
+    res.status(200).json({ message: "Post liked successfully", like });
+  } catch (error) {
+    console.error("Error liking post:", error);
+    res.status(500).json({ error: "Could not like post" });
+  }
+}) as RequestHandler);
+
+router.get("/:postId/likes", async (req, res) => {
+  try {
+    const { postId } = req.params;
+
+    const params = {
+      TableName: TableNames.LIKES,
+      KeyConditionExpression: "postId = :postId",
+      ExpressionAttributeValues: {
+        ":postId": postId,
+      },
+    };
+
+    const result = await dynamoDB.query(params).promise();
+
+    res.status(200).json({ likes: result.Items });
+  } catch (error) {
+    console.error("Error fetching likes:", error);
+    res.status(500).json({ error: "Could not fetch likes" });
+  }
+});
 
 export default router;

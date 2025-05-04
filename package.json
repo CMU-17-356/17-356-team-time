@@ -26,5 +26,6 @@
     "setupFiles": [
       "<rootDir>/jest.setup.js"
     ]
-  }
+  },
+  "proxy": "http://localhost:5001"
 }

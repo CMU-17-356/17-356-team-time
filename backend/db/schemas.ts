@@ -28,8 +28,31 @@ export interface Post {
   updatedAt?: string;
 }
 
+/**
+ * Comment model - represents user's comment
+ */
+export interface Comment {
+  commentId: string; // Primary key
+  postId: string; // Foreign key to Post.postId
+  userId: string; // Foreign key to Profile.userId
+  content: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+/**
+ * Like model - represents user's likes
+ */
+export interface Like {
+  userId: string; // Foreign key to Profile.userId
+  postId: string; // Foreign key to Post.postId
+  createdAt: string;
+}
+
 // Table names as constants for easier referencing
 export enum TableNames {
   PROFILES = "Profiles",
   POSTS = "Posts",
+  COMMENTS = "Comments",
+  LIKES = "Likes",
 }

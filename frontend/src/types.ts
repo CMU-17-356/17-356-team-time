@@ -38,6 +38,7 @@ export interface ProfileHeaderProps extends Researcher {
 }
 
 export interface Post {
+  timestamp: string;
   postId: string;
   authorId: string;
   authorName: string;
@@ -49,6 +50,14 @@ export interface Post {
   commentCount: number;
   createdAt: string;
   updatedAt: string;
+  links: Array<{ url: string; title: string }>;
+  liked?: boolean;
+  comments: Array<{
+    id: string;
+    text: string;
+    author: string;
+    timestamp: string;
+  }>;
 }
 
 export interface PostFeedProps {
@@ -60,5 +69,11 @@ export interface PostFeedProps {
 export interface PostCardProps {
   post: Post;
   onLike?: (postId: string) => void;
-  onComment?: (postId: string) => void;
+  onComment?: (
+    postId: string,
+    userId: string,
+    content: string,
+    createdAt: string,
+  ) => void;
+  fetchComments?: (postId: string) => void;
 }
