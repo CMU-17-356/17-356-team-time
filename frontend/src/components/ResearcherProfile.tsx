@@ -1,71 +1,68 @@
-import {
-  ExternalLink,
-  Heart,
-  MessageSquare,
-  Repeat2,
-  Share2,
-} from "lucide-react";
-import { useState } from "react";
+import { Heart, MessageSquare, Repeat2, Share2 } from "lucide-react";
+import { useState, useEffect } from "react";
 import { ProfileHeaderProps, Researcher } from "../types";
 import { ProfileHeader } from "./ProfileHeader";
+import axios from "axios";
+import { FOLLOWS_API_ENDPOINT } from "../consts";
 
 interface Post {
   id: string;
+  title: string;
   content: string;
+  author: string;
   timestamp: string;
-  links: Array<{
-    url: string;
-    title: string;
-  }>;
-  liked: boolean;
-  commentOpen: boolean;
-  comments: Array<{
-    id: string;
-    text: string;
-    author: string;
-    timestamp: string;
-  }>;
+  likes: number;
+  comments: Comment[];
+}
+
+interface Comment {
+  id: string;
+  text: string;
+  author: string;
+  timestamp: string;
+}
+
+interface FollowStatusResponse {
+  isFollowing: boolean;
 }
 
 export const ResearcherProfile = (props: Researcher) => {
-  const [researcher, setResearcher] = useState<Researcher>(props);
+  const [researcher, setResearcher] = useState<Researcher>({
+    ...props,
+    following: props.following || 0,
+    followers: props.followers || 0,
+    isFollowing: props.isFollowing || false,
+  });
   // Sample posts
   const [posts, setPosts] = useState<Post[]>([
     {
       id: "1",
+      title: "Quantum Entanglement in Large Scale Systems",
       content:
         "Just published our new paper on quantum entanglement! Check out the link for the full text.",
+      author: "You",
       timestamp: "March 22, 2025",
-      links: [
-        {
-          url: "https://arxiv.org/abs/2503.12345",
-          title: "Quantum Entanglement in Large Scale Systems",
-        },
-      ],
-      liked: false,
-      commentOpen: false,
+      likes: 0,
       comments: [],
     },
     {
       id: "2",
+      title: "IQCC 2025 Schedule",
       content:
         "Excited to announce I'll be speaking at the International Quantum Computing Conference next month! Looking forward to sharing our latest research.",
+      author: "You",
       timestamp: "March 15, 2025",
-      links: [{ url: "https://iqcc2025.org", title: "IQCC 2025 Schedule" }],
-      liked: false,
-      commentOpen: false,
+      likes: 0,
       comments: [],
     },
     {
       id: "3",
+      title: "PhD Positions",
       content:
         "Our lab is recruiting PhD students for Fall 2025. Looking for candidates with strong backgrounds in physics and computer science.",
+      author: "You",
       timestamp: "March 10, 2025",
-      links: [
-        { url: "https://mit.edu/qclab/positions", title: "PhD Positions" },
-      ],
-      liked: false,
-      commentOpen: false,
+      likes: 0,
       comments: [],
     },
   ]);
@@ -77,16 +74,18 @@ export const ResearcherProfile = (props: Researcher) => {
   const toggleLike = (postId: string) => {
     setPosts(
       posts.map((post) =>
-        post.id === postId ? { ...post, liked: !post.liked } : post,
+        post.id === postId ? { ...post, likes: post.likes + 1 } : post,
       ),
     );
   };
 
-  // Toggle comment section
-  const toggleComment = (postId: string) => {
+  // Toggle comments for a post
+  const toggleComments = (postId: string) => {
     setPosts(
       posts.map((post) =>
-        post.id === postId ? { ...post, commentOpen: !post.commentOpen } : post,
+        post.id === postId
+          ? { ...post, comments: post.comments.length > 0 ? [] : post.comments }
+          : post,
       ),
     );
   };
@@ -125,10 +124,74 @@ export const ResearcherProfile = (props: Researcher) => {
     });
   };
 
+  // Check follow status when profile loads
+  useEffect(() => {
+    if (!props.isOwnProfile) {
+      const userData = localStorage.getItem("userData");
+      if (!userData) {
+        console.error("No user data found");
+        return;
+      }
+
+      const currentUserId = JSON.parse(userData).username;
+
+      // Check follow status
+      axios
+        .get<FollowStatusResponse>(
+          `${FOLLOWS_API_ENDPOINT}/${props.userId}/status?followerId=${currentUserId}`,
+        )
+        .then((response) => {
+          setResearcher((prev) => ({
+            ...prev,
+            isFollowing: response.data.isFollowing,
+          }));
+        })
+        .catch((error) => {
+          console.error("Error checking follow status:", error);
+        });
+
+      // Get follower count
+      axios
+        .get(`${FOLLOWS_API_ENDPOINT}/${props.userId}/followers/count`)
+        .then((response) => {
+          setResearcher((prev) => ({
+            ...prev,
+            followers: response.data.followers || 0,
+          }));
+        })
+        .catch((error) => {
+          console.error("Error getting followers count:", error);
+        });
+
+      // Get following count
+      axios
+        .get(`${FOLLOWS_API_ENDPOINT}/${props.userId}/following/count`)
+        .then((response) => {
+          setResearcher((prev) => ({
+            ...prev,
+            following: response.data.following || 0,
+          }));
+        })
+        .catch((error) => {
+          console.error("Error getting following count:", error);
+        });
+    }
+  }, [props.userId, props.isOwnProfile]);
+
+  // Handle follow state updates
+  const handleFollowUpdate = (researcher: Researcher) => {
+    setResearcher((prev) => ({
+      ...prev,
+      ...researcher,
+      isFollowing: researcher.isFollowing,
+      followers: researcher.followers,
+    }));
+  };
+
   const headerProps: ProfileHeaderProps = {
     ...researcher,
-    isFollowing: false, // Placeholder for follow state
-    setResearcher,
+    isFollowing: researcher.isFollowing || false,
+    setResearcher: handleFollowUpdate,
     isOwnProfile: props.isOwnProfile,
   };
 
@@ -141,22 +204,6 @@ export const ResearcherProfile = (props: Researcher) => {
         {posts.map((post) => (
           <div key={post.id} className="bg-white rounded-lg shadow-md p-4">
             <p className="mb-2">{post.content}</p>
-            {post.links.length > 0 && (
-              <div className="mt-2">
-                {post.links.map((link, index) => (
-                  <a
-                    key={index}
-                    href={link.url}
-                    className="flex items-center text-blue-600 hover:underline mt-1"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <ExternalLink size={14} className="mr-1" />
-                    {link.title}
-                  </a>
-                ))}
-              </div>
-            )}
             <div className="mt-2 text-sm text-gray-500">{post.timestamp}</div>
 
             {/* Post Actions */}
@@ -164,12 +211,12 @@ export const ResearcherProfile = (props: Researcher) => {
               <button
                 onClick={() => toggleLike(post.id)}
                 className={`flex items-center ${
-                  post.liked ? "text-red-500" : "text-gray-500"
+                  post.likes > 0 ? "text-red-500" : "text-gray-500"
                 } hover:text-red-500`}
               >
                 <Heart
                   size={18}
-                  fill={post.liked ? "currentColor" : "none"}
+                  fill={post.likes > 0 ? "currentColor" : "none"}
                   className="mr-1"
                 />
                 <span className="text-sm">Like</span>
@@ -181,7 +228,7 @@ export const ResearcherProfile = (props: Researcher) => {
               </button>
 
               <button
-                onClick={() => toggleComment(post.id)}
+                onClick={() => toggleComments(post.id)}
                 className="flex items-center text-gray-500 hover:text-blue-500"
               >
                 <MessageSquare size={18} className="mr-1" />
@@ -195,7 +242,7 @@ export const ResearcherProfile = (props: Researcher) => {
             </div>
 
             {/* Comment Section */}
-            {post.commentOpen && (
+            {post.comments && (
               <div className="mt-4 pt-3 border-t border-gray-100">
                 {/* Existing Comments */}
                 {post.comments.length > 0 && (

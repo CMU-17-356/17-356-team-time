@@ -17,6 +17,7 @@ import {
   PROFILE_API_ENDPOINT,
   PROFILE_IMAGE_NAME,
   PROFILE_IMG_ENDPOINT,
+  FOLLOWS_API_ENDPOINT,
 } from "../consts";
 import { Profile, ProfileHeaderProps } from "../types";
 import { ProfileInterests } from "./ProfileInterests";
@@ -27,7 +28,7 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
   // const [profileHover, setProfileHover] = useState(false);
   const [showImageUpload, setShowImageUpload] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [isFollowing, setisFollowing] = useState(props.isFollowing);
+  const [isFollowing, setIsFollowing] = useState(props.isFollowing);
   const [currentImage, setCurrentImage] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [imageBlob, setImageBlob] = useState<Blob | null>(null);
@@ -36,6 +37,29 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
   const [tempInterests, setTempInterests] = useState(
     props.fieldOfInterest || "",
   );
+
+  // Check follow status when component mounts
+  useEffect(() => {
+    const checkFollowStatus = async () => {
+      const userData = localStorage.getItem("userData");
+      if (!userData || props.isOwnProfile) return;
+
+      const currentUserId = JSON.parse(userData).username;
+      try {
+        const response = await axios.get(
+          `${FOLLOWS_API_ENDPOINT}/${props.userId}/status`,
+          {
+            params: { followerId: currentUserId },
+          },
+        );
+        setIsFollowing(response.data.isFollowing);
+      } catch (error) {
+        console.error("Error checking follow status:", error);
+      }
+    };
+
+    checkFollowStatus();
+  }, [props.userId, props.isOwnProfile]);
 
   // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -222,12 +246,92 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
 
   // Toggle follow state
   const toggleFollow = () => {
-    // TODO: push follow changes to server
-    setisFollowing(!isFollowing);
+    const endpoint = `${FOLLOWS_API_ENDPOINT}/${props.userId}`;
+    const method = isFollowing ? "delete" : "post";
+
+    // Get the current user's ID from localStorage
+    const userData = localStorage.getItem("userData");
+    if (!userData) {
+      console.error("No user data found");
+      return;
+    }
+
+    const currentUserId = JSON.parse(userData).username;
+
+    // Don't allow following yourself
+    if (currentUserId === props.userId) {
+      console.error("Cannot follow yourself");
+      return;
+    }
+
+    // Optimistically update the UI
+    const newFollowingState = !isFollowing;
+    setIsFollowing(newFollowingState);
     props.setResearcher({
       ...props,
-      followers: isFollowing ? props.followers - 1 : props.followers + 1,
+      followers: newFollowingState
+        ? (props.followers || 0) + 1
+        : (props.followers || 0) - 1,
+      isFollowing: newFollowingState,
     });
+
+    // Make the request based on the method
+    if (method === "delete") {
+      axios
+        .delete(endpoint, { data: { followerId: currentUserId } })
+        .catch((error) => {
+          // Revert the optimistic update if the request fails
+          setIsFollowing(!newFollowingState);
+          props.setResearcher({
+            ...props,
+            followers: !newFollowingState
+              ? (props.followers || 0) + 1
+              : (props.followers || 0) - 1,
+            isFollowing: !newFollowingState,
+          });
+          handleFollowError(error);
+        });
+    } else {
+      axios.post(endpoint, { followerId: currentUserId }).catch((error) => {
+        // Revert the optimistic update if the request fails
+        setIsFollowing(!newFollowingState);
+        props.setResearcher({
+          ...props,
+          followers: !newFollowingState
+            ? (props.followers || 0) + 1
+            : (props.followers || 0) - 1,
+          isFollowing: !newFollowingState,
+        });
+        handleFollowError(error);
+      });
+    }
+  };
+
+  const handleFollowError = (error: any) => {
+    console.error("Error toggling follow:", error);
+    if (error.response) {
+      if (error.response.status === 404) {
+        console.error("Profile not found:", error.response.data.error);
+      } else if (error.response.status === 409) {
+        // If we get a 409, it means we're already following/unfollowing
+        // Update local state to match server state
+        const newFollowingState = !isFollowing;
+        setIsFollowing(newFollowingState);
+        props.setResearcher({
+          ...props,
+          followers: newFollowingState
+            ? (props.followers || 0) + 1
+            : (props.followers || 0) - 1,
+          isFollowing: newFollowingState,
+        });
+      } else {
+        console.error("Server error:", error.response.data.error);
+      }
+    } else if (error.request) {
+      console.error("No response received from server");
+    } else {
+      console.error("Error setting up request:", error.message);
+    }
   };
 
   // Handle profile picture upload
@@ -399,27 +503,29 @@ export const ProfileHeader = (props: ProfileHeaderProps) => {
                       </div>
                     )}
 
-                    {/* Follow Button */}
-                    <button
-                      onClick={toggleFollow}
-                      className={`flex items-center justify-center px-4 py-2 rounded-full text-sm font-medium ${
-                        isFollowing
-                          ? "bg-gray-200 text-gray-800 hover:bg-gray-300"
-                          : "bg-blue-600 text-white hover:bg-blue-700"
-                      }`}
-                    >
-                      {isFollowing ? (
-                        <>
-                          <Check size={16} className="mr-1" />
-                          Following
-                        </>
-                      ) : (
-                        <>
-                          <UserPlus size={16} className="mr-1" />
-                          Follow
-                        </>
-                      )}
-                    </button>
+                    {/* Follow Button - Only show when viewing another user's profile */}
+                    {!props.isOwnProfile && (
+                      <button
+                        onClick={toggleFollow}
+                        className={`flex items-center justify-center px-4 py-2 rounded-full text-sm font-medium ${
+                          isFollowing
+                            ? "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                            : "bg-blue-600 text-white hover:bg-blue-700"
+                        }`}
+                      >
+                        {isFollowing ? (
+                          <>
+                            <Check size={16} className="mr-1" />
+                            Following
+                          </>
+                        ) : (
+                          <>
+                            <UserPlus size={16} className="mr-1" />
+                            Follow
+                          </>
+                        )}
+                      </button>
+                    )}
                   </div>
                 </div>
 
