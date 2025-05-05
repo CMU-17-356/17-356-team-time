@@ -18,6 +18,8 @@ router.post("/", (async (req, res) => {
       bio: req.body.bio,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      following: 0, // Initialize following count
+      followers: 0, // Initialize followers count
     };
 
     const params = {
