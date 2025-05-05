@@ -144,19 +144,37 @@ describe("ProfileHeader Component", () => {
 
   // Follow Functionality Tests
   describe("Follow Functionality", () => {
-    test("toggles follow state", () => {
-      const setResearcher = jest.fn();
-      createTestComponent({ setResearcher });
+    beforeEach(() => {
+      // Mock localStorage
+      const mockUserData = JSON.stringify({ username: "testuser" });
+      Storage.prototype.getItem = jest.fn(() => mockUserData);
 
-      // Click follow button
-      const followButton = screen.getByText("Follow");
+      // Mock successful API response
+      mockedAxios.post.mockResolvedValue({});
+    });
+
+    test("toggles follow state", async () => {
+      const setResearcher = jest.fn();
+      createTestComponent({ setResearcher, isOwnProfile: false });
+
+      // Click follow button using a more flexible text matcher
+      const followButton = screen.getByRole("button", { name: /follow/i });
       fireEvent.click(followButton);
 
-      // Check if follow state updated
-      expect(setResearcher).toHaveBeenCalledWith(
-        expect.objectContaining({
-          followers: 21, // Increased by 1
-        }),
+      // Wait for the state update
+      await waitFor(() => {
+        expect(setResearcher).toHaveBeenCalledWith(
+          expect.objectContaining({
+            followers: 21, // Increased by 1
+            isFollowing: true,
+          }),
+        );
+      });
+
+      // Verify the API call was made
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        expect.stringContaining("/api/follows/123"),
+        expect.objectContaining({ followerId: "testuser" }),
       );
     });
   });
