@@ -12,6 +12,8 @@ export interface Profile {
   institution?: string; // Optional
   fieldOfInterest?: string; // Optional
   bio?: string; // Optional
+  following?: number; // Number of users this profile is following
+  followers?: number; // Number of users following this profile
 }
 
 /**
@@ -28,8 +30,19 @@ export interface Post {
   updatedAt?: string;
 }
 
+/**
+ * Follow relationship model - tracks who follows whom
+ */
+export interface FollowRelationship {
+  followerId: string; // Partition key
+  followingId: string; // Sort key
+  createdAt: string;
+}
+
 // Table names as constants for easier referencing
 export enum TableNames {
+  USERS = "Users",
   PROFILES = "Profiles",
   POSTS = "Posts",
+  FOLLOWS = "Follows",
 }
