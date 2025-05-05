@@ -1,61 +1,56 @@
-import React, { useState, useEffect } from "react";
 import axios from "axios";
+import React, { useState } from "react";
 import { useNavigate } from "react-router";
-import { PROFILE_API_ENDPOINT } from "../consts";
+import { useAuth } from "../context/AuthContext";
 
-interface Profile {
-  userId: string;
-  firstName: string;
-  lastName: string;
-}
+// interface Profile {
+//   userId: string;
+//   firstName: string;
+//   lastName: string;
+// }
 
 const CreatePost: React.FC = () => {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
     content: "",
     tagInput: "",
   });
-  const [selectedUserId, setSelectedUserId] = useState<string>("");
-  const [profiles, setProfiles] = useState<Profile[]>([]);
+  // const [selectedUserId, setSelectedUserId] = useState<string>("");
+  // const [profiles, setProfiles] = useState<Profile[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+  // const [isLoading, setIsLoading] = useState(true);
 
   // Fetch profiles on component mount
-  useEffect(() => {
-    const fetchProfiles = async () => {
-      try {
-        const response = await axios.get(`${PROFILE_API_ENDPOINT}`);
-        setProfiles(response.data.profiles || []);
+  // useEffect(() => {
+  //   const fetchProfiles = async () => {
+  //     try {
+  //       const response = await axios.get(`${PROFILE_API_ENDPOINT}`);
+  //       setProfiles(response.data.profiles || []);
 
-        // Set the first profile as default if available
-        if (response.data.profiles && response.data.profiles.length > 0) {
-          setSelectedUserId(response.data.profiles[0].userId);
-        }
+  //       // Set the first profile as default if available
+  //       if (response.data.profiles && response.data.profiles.length > 0) {
+  //         setSelectedUserId(response.data.profiles[0].userId);
+  //       }
 
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Error fetching profiles:", error);
-        setError("Failed to load user profiles");
-        setIsLoading(false);
-      }
-    };
+  //       setIsLoading(false);
+  //     } catch (error) {
+  //       console.error("Error fetching profiles:", error);
+  //       setError("Failed to load user profiles");
+  //       setIsLoading(false);
+  //     }
+  //   };
 
-    fetchProfiles();
-  }, []);
+  //   fetchProfiles();
+  // }, []);
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    if (e.target.name === "userId") {
-      setSelectedUserId(e.target.value);
-    } else {
-      setFormData({ ...formData, [e.target.name]: e.target.value });
-    }
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   // Handle tag input
@@ -78,14 +73,6 @@ const CreatePost: React.FC = () => {
     }
   };
 
-  const handleFileUpload = () => {
-    alert("File upload functionality!");
-  };
-
-  const handleImageUpload = () => {
-    alert("Image upload functionality!");
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -94,10 +81,10 @@ const CreatePost: React.FC = () => {
       return;
     }
 
-    if (!selectedUserId) {
-      setError("Please select an author");
-      return;
-    }
+    // if (!selectedUserId) {
+    //   setError("Please select an author");
+    //   return;
+    // }
 
     setIsSubmitting(true);
     setError("");
@@ -107,7 +94,7 @@ const CreatePost: React.FC = () => {
         title: formData.title,
         content: formData.content,
         tags: tags,
-        userId: selectedUserId,
+        userId: user?.username,
         likeCount: 0, // Initialize with 0 likes
       });
 
@@ -115,7 +102,7 @@ const CreatePost: React.FC = () => {
       console.log("Post Created:", response.data);
 
       // Redirect to the profile page
-      navigate(`/profile/${selectedUserId}`, { replace: true });
+      navigate(`/profile/${user?.username}`, { replace: true });
     } catch (error) {
       console.error("Error creating post:", error);
       setError("Failed to create post. Please try again.");
@@ -124,9 +111,9 @@ const CreatePost: React.FC = () => {
     }
   };
 
-  if (isLoading) {
-    return <div className="text-center p-8">Loading profiles...</div>;
-  }
+  // if (isLoading) {
+  //   return <div className="text-center p-8">Loading profiles...</div>;
+  // }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-[#ffffff]">
@@ -140,7 +127,7 @@ const CreatePost: React.FC = () => {
         )}
 
         <form onSubmit={handleSubmit} className="w-full">
-          {/* Author Selection Dropdown */}
+          {/* Author Selection Dropdown
           <div className="mb-4">
             <label
               htmlFor="userId"
@@ -165,7 +152,7 @@ const CreatePost: React.FC = () => {
                 </option>
               ))}
             </select>
-          </div>
+          </div> */}
 
           <input
             type="text"
@@ -188,7 +175,9 @@ const CreatePost: React.FC = () => {
           <div className="mb-4 flex gap-2">
             <button
               type="button"
-              onClick={handleFileUpload}
+              onClick={() => {
+                /* do nothing */
+              }}
               className="flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
             >
               <svg
@@ -210,7 +199,9 @@ const CreatePost: React.FC = () => {
 
             <button
               type="button"
-              onClick={handleImageUpload}
+              onClick={() => {
+                /* do nothing */
+              }}
               className="flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
             >
               <svg

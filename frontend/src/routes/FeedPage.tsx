@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
 import axios from "axios";
-import { Post } from "../types";
-import { POST_API_ENDPOINT } from "../consts";
+import { useEffect, useState } from "react";
 import { PostFeed } from "../components/PostFeed";
+import { POST_API_ENDPOINT } from "../consts";
+import { Post } from "../types";
 
 export const FeedPage = () => {
   const [posts, setPosts] = useState<Post[]>([]);

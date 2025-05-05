@@ -1,74 +1,46 @@
-import {
-  ExternalLink,
-  Heart,
-  MessageSquare,
-  Repeat2,
-  Share2,
-} from "lucide-react";
-import { useState } from "react";
-import { ProfileHeaderProps, Researcher } from "../types";
+import "axios";
+import axios from "axios";
+import { Heart, MessageSquare, Repeat2, Share2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { POST_API_ENDPOINT } from "../consts";
+import { Post, ProfileHeaderProps, Researcher } from "../types";
 import { ProfileHeader } from "./ProfileHeader";
 
-interface Post {
+interface ProfilePost extends Post {
+  commentOpen?: boolean; // Whether the comment section is open
+  comments: Comment[];
+}
+
+interface Comment {
   id: string;
-  content: string;
+  text: string;
+  author: string;
   timestamp: string;
-  links: Array<{
-    url: string;
-    title: string;
-  }>;
-  liked: boolean;
-  commentOpen: boolean;
-  comments: Array<{
-    id: string;
-    text: string;
-    author: string;
-    timestamp: string;
-  }>;
 }
 
 export const ResearcherProfile = (props: Researcher) => {
   const [researcher, setResearcher] = useState<Researcher>(props);
   // Sample posts
-  const [posts, setPosts] = useState<Post[]>([
-    {
-      id: "1",
-      content:
-        "Just published our new paper on quantum entanglement! Check out the link for the full text.",
-      timestamp: "March 22, 2025",
-      links: [
-        {
-          url: "https://arxiv.org/abs/2503.12345",
-          title: "Quantum Entanglement in Large Scale Systems",
-        },
-      ],
-      liked: false,
-      commentOpen: false,
-      comments: [],
-    },
-    {
-      id: "2",
-      content:
-        "Excited to announce I'll be speaking at the International Quantum Computing Conference next month! Looking forward to sharing our latest research.",
-      timestamp: "March 15, 2025",
-      links: [{ url: "https://iqcc2025.org", title: "IQCC 2025 Schedule" }],
-      liked: false,
-      commentOpen: false,
-      comments: [],
-    },
-    {
-      id: "3",
-      content:
-        "Our lab is recruiting PhD students for Fall 2025. Looking for candidates with strong backgrounds in physics and computer science.",
-      timestamp: "March 10, 2025",
-      links: [
-        { url: "https://mit.edu/qclab/positions", title: "PhD Positions" },
-      ],
-      liked: false,
-      commentOpen: false,
-      comments: [],
-    },
-  ]);
+  const [posts, setPosts] = useState<ProfilePost[]>([]);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await axios.get(`${POST_API_ENDPOINT}`);
+        console.log("API Response:", response.data);
+        // The API returns { posts: Post[] }
+        const postsData = (response.data.posts || []).filter(
+          (post: Post) => post.authorId === researcher.userId,
+        );
+
+        setPosts(postsData);
+      } catch (err) {
+        console.error("Error fetching posts:", err);
+      }
+    };
+
+    fetchPosts();
+  }, [researcher.userId]);
 
   // UI States
   const [commentText, setCommentText] = useState<{ [key: string]: string }>({});
@@ -77,16 +49,18 @@ export const ResearcherProfile = (props: Researcher) => {
   const toggleLike = (postId: string) => {
     setPosts(
       posts.map((post) =>
-        post.id === postId ? { ...post, liked: !post.liked } : post,
+        post.postId === postId ? { ...post, liked: !post.liked } : post,
       ),
     );
   };
 
-  // Toggle comment section
+  // // Toggle comment section
   const toggleComment = (postId: string) => {
     setPosts(
       posts.map((post) =>
-        post.id === postId ? { ...post, commentOpen: !post.commentOpen } : post,
+        post.postId === postId
+          ? { ...post, commentOpen: !post.commentOpen }
+          : post,
       ),
     );
   };
@@ -112,7 +86,7 @@ export const ResearcherProfile = (props: Researcher) => {
 
     setPosts(
       posts.map((post) =>
-        post.id === postId
+        post.postId === postId
           ? { ...post, comments: [...post.comments, newComment] }
           : post,
       ),
@@ -138,109 +112,104 @@ export const ResearcherProfile = (props: Researcher) => {
       {/* Posts Feed */}
       <h3 className="text-xl font-semibold mb-4">Recent Updates</h3>
       <div className="space-y-4">
-        {posts.map((post) => (
-          <div key={post.id} className="bg-white rounded-lg shadow-md p-4">
-            <p className="mb-2">{post.content}</p>
-            {post.links.length > 0 && (
-              <div className="mt-2">
-                {post.links.map((link, index) => (
-                  <a
-                    key={index}
-                    href={link.url}
-                    className="flex items-center text-blue-600 hover:underline mt-1"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <ExternalLink size={14} className="mr-1" />
-                    {link.title}
-                  </a>
-                ))}
-              </div>
-            )}
-            <div className="mt-2 text-sm text-gray-500">{post.timestamp}</div>
+        {posts.length > 0 ? (
+          posts.map((post) => (
+            <div
+              key={post.postId}
+              className="bg-white rounded-lg shadow-md p-4"
+            >
+              <p className="mb-2">{post.content}</p>
+              <div className="mt-2 text-sm text-gray-500">{post.updatedAt}</div>
 
-            {/* Post Actions */}
-            <div className="mt-3 pt-3 border-t border-gray-100 flex justify-between">
-              <button
-                onClick={() => toggleLike(post.id)}
-                className={`flex items-center ${
-                  post.liked ? "text-red-500" : "text-gray-500"
-                } hover:text-red-500`}
-              >
-                <Heart
-                  size={18}
-                  fill={post.liked ? "currentColor" : "none"}
-                  className="mr-1"
-                />
-                <span className="text-sm">Like</span>
-              </button>
-
-              <button className="flex items-center text-gray-500 hover:text-green-500">
-                <Repeat2 size={18} className="mr-1" />
-                <span className="text-sm">Repost</span>
-              </button>
-
-              <button
-                onClick={() => toggleComment(post.id)}
-                className="flex items-center text-gray-500 hover:text-blue-500"
-              >
-                <MessageSquare size={18} className="mr-1" />
-                <span className="text-sm">Comment</span>
-              </button>
-
-              <button className="flex items-center text-gray-500 hover:text-purple-500">
-                <Share2 size={18} className="mr-1" />
-                <span className="text-sm">Share</span>
-              </button>
-            </div>
-
-            {/* Comment Section */}
-            {post.commentOpen && (
-              <div className="mt-4 pt-3 border-t border-gray-100">
-                {/* Existing Comments */}
-                {post.comments.length > 0 && (
-                  <div className="mb-4 space-y-3">
-                    {post.comments.map((comment) => (
-                      <div
-                        key={comment.id}
-                        className="bg-gray-50 p-3 rounded-lg"
-                      >
-                        <div className="flex justify-between">
-                          <span className="font-medium">{comment.author}</span>
-                          <span className="text-xs text-gray-500">
-                            {comment.timestamp}
-                          </span>
-                        </div>
-                        <p className="mt-1 text-sm">{comment.text}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Comment Editor */}
-                <div className="mt-2">
-                  <textarea
-                    placeholder="Write a comment..."
-                    value={commentText[post.id] || ""}
-                    onChange={(e) =>
-                      handleCommentChange(post.id, e.target.value)
-                    }
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                    rows={2}
+              {/* Post Actions */}
+              <div className="mt-3 pt-3 border-t border-gray-100 flex justify-between">
+                <button
+                  onClick={() => toggleLike(post.postId)}
+                  className={`flex items-center ${
+                    post.liked ? "text-red-500" : "text-gray-500"
+                  } hover:text-red-500`}
+                >
+                  <Heart
+                    size={18}
+                    fill={post.liked ? "currentColor" : "none"}
+                    className="mr-1"
                   />
-                  <div className="mt-2 flex justify-end">
-                    <button
-                      onClick={() => submitComment(post.id)}
-                      className="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
-                    >
-                      Comment
-                    </button>
+                  <span className="text-sm">Like</span>
+                </button>
+
+                <button className="flex items-center text-gray-500 hover:text-green-500">
+                  <Repeat2 size={18} className="mr-1" />
+                  <span className="text-sm">Repost</span>
+                </button>
+
+                <button
+                  onClick={() => toggleComment(post.postId)}
+                  className="flex items-center text-gray-500 hover:text-blue-500"
+                >
+                  <MessageSquare size={18} className="mr-1" />
+                  <span className="text-sm">Comment</span>
+                </button>
+
+                <button className="flex items-center text-gray-500 hover:text-purple-500">
+                  <Share2 size={18} className="mr-1" />
+                  <span className="text-sm">Share</span>
+                </button>
+              </div>
+
+              {/* Comment Section */}
+              {post.commentOpen && (
+                <div className="mt-4 pt-3 border-t border-gray-100">
+                  {/* Existing Comments */}
+                  {post.comments.length > 0 && (
+                    <div className="mb-4 space-y-3">
+                      {post.comments.map((comment) => (
+                        <div
+                          key={comment.id}
+                          className="bg-gray-50 p-3 rounded-lg"
+                        >
+                          <div className="flex justify-between">
+                            <span className="font-medium">
+                              {comment.author}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              {comment.timestamp}
+                            </span>
+                          </div>
+                          <p className="mt-1 text-sm">{comment.text}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Comment Editor */}
+                  <div className="mt-2">
+                    <textarea
+                      placeholder="Write a comment..."
+                      value={commentText[post.postId] || ""}
+                      onChange={(e) =>
+                        handleCommentChange(post.postId, e.target.value)
+                      }
+                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      rows={2}
+                    />
+                    <div className="mt-2 flex justify-end">
+                      <button
+                        onClick={() => submitComment(post.postId)}
+                        className="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
+                      >
+                        Comment
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
+          ))
+        ) : (
+          <div className="text-lg italic font-semibold text-slate-500">
+            This user has no posts yet.
           </div>
-        ))}
+        )}
       </div>
     </div>
   );

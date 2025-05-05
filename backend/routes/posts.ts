@@ -1,7 +1,7 @@
 import express, { RequestHandler } from "express";
+import { v4 as uuidv4 } from "uuid";
 import dynamoDB from "../db/config/dynamodb";
 import { Post, Profile, TableNames } from "../db/schemas";
-import { v4 as uuidv4 } from "uuid";
 
 const router = express.Router();
 
@@ -99,7 +99,7 @@ router.get("/:postId", (async (req, res) => {
 // Get all posts in db
 router.get("/", (async (req, res) => {
   try {
-    const limit = parseInt(req.query.limit as string) || 10;
+    const limit = parseInt(req.query.limit as string) || 100;
     const lastEvaluatedKey = req.query.lastEvaluatedKey
       ? JSON.parse(req.query.lastEvaluatedKey as string)
       : undefined;

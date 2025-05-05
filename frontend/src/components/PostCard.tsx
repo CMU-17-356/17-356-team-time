@@ -5,8 +5,9 @@ import {
   Repeat2,
   Share2,
 } from "lucide-react";
-import { PostCardProps } from "../types";
 import { Link } from "react-router-dom";
+import { PostCardProps } from "../types";
+import ProfileImage from "./ProfileImage";
 
 export const PostCard = ({
   post,
@@ -24,13 +25,9 @@ export const PostCard = ({
   onSubmitComment?: () => void;
 }) => {
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 mb-4">
+    <div className="bg-white rounded-lg shadow-md p-4 mb-4 border-2 border-slate-200">
       <div className="flex items-center mb-4">
-        <img
-          src={post.authorProfilePicture}
-          alt={post.authorName}
-          className="w-10 h-10 rounded-full mr-3"
-        />
+        <ProfileImage userId={post.authorId} width={10} />
         <div>
           <Link
             to={`/profile/${post.authorId}`}
