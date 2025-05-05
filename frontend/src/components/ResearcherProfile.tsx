@@ -3,7 +3,12 @@ import axios from "axios";
 import { Heart, MessageSquare, Repeat2, Share2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { FOLLOWS_API_ENDPOINT, POST_API_ENDPOINT } from "../consts";
-import { Post, ProfileHeaderProps, Researcher } from "../types";
+import {
+  FollowStatusResponse,
+  Post,
+  ProfileHeaderProps,
+  Researcher,
+} from "../types";
 import { ProfileHeader } from "./ProfileHeader";
 
 interface ProfilePost extends Post {
@@ -13,23 +18,10 @@ interface ProfilePost extends Post {
 
 interface Comment {
   id: string;
-  // title: string;
   content: string;
   author: string;
   timestamp: string;
   likes: number;
-  // comments: Comment[];
-}
-
-// interface Comment {
-//   id: string;
-//   text: string;
-//   author: string;
-//   timestamp: string;
-// }
-
-interface FollowStatusResponse {
-  isFollowing: boolean;
 }
 
 export const ResearcherProfile = (props: Researcher) => {
@@ -60,64 +52,6 @@ export const ResearcherProfile = (props: Researcher) => {
 
     fetchPosts();
   }, [researcher.userId]);
-
-  // UI States
-  const [commentText, setCommentText] = useState<{ [key: string]: string }>({});
-
-  // Toggle like on a post
-  const toggleLike = (postId: string) => {
-    setPosts(
-      posts.map((post) =>
-        post.postId === postId ? { ...post, liked: !post.liked } : post,
-      ),
-    );
-  };
-
-  // Toggle comments for a post
-  const toggleComments = (postId: string) => {
-    setPosts(
-      posts.map((post) =>
-        post.postId === postId
-          ? { ...post, comments: post.comments.length > 0 ? [] : post.comments }
-          : post,
-      ),
-    );
-  };
-
-  // Handle comment text change
-  const handleCommentChange = (postId: string, text: string) => {
-    setCommentText({
-      ...commentText,
-      [postId]: text,
-    });
-  };
-
-  // Submit a comment
-  const submitComment = (postId: string) => {
-    if (!commentText[postId]?.trim()) return;
-
-    const newComment: Comment = {
-      id: Date.now().toString(),
-      content: commentText[postId],
-      author: "You",
-      timestamp: new Date().toLocaleDateString(),
-      likes: 0,
-    };
-
-    setPosts(
-      posts.map((post) =>
-        post.postId === postId
-          ? { ...post, comments: [...post.comments, newComment] }
-          : post,
-      ),
-    );
-
-    // Clear the comment text
-    setCommentText({
-      ...commentText,
-      [postId]: "",
-    });
-  };
 
   // Check follow status when profile loads
   useEffect(() => {
@@ -196,92 +130,77 @@ export const ResearcherProfile = (props: Researcher) => {
       {/* Posts Feed */}
       <h3 className="text-xl font-semibold mb-4">Recent Updates</h3>
       <div className="space-y-4">
-        {posts.map((post) => (
-          <div key={post.postId} className="bg-white rounded-lg shadow-md p-4">
-            <p className="mb-2">{post.content}</p>
-            <div className="mt-2 text-sm text-gray-500">{post.updatedAt}</div>
+        {posts.length > 0 ? (
+          posts.map((post) => (
+            <div
+              key={post.postId}
+              className="bg-white rounded-lg shadow-md p-4"
+            >
+              <p className="mb-2">{post.content}</p>
+              <div className="mt-2 text-sm text-gray-500">{post.updatedAt}</div>
 
-            {/* Post Actions */}
-            <div className="mt-3 pt-3 border-t border-gray-100 flex justify-between">
-              <button
-                onClick={() => toggleLike(post.postId)}
-                className={`flex items-center text-gray-500 hover:text-red-500`}
-              >
-                <Heart size={18} fill={"currentColor"} className="mr-1" />
-                <span className="text-sm">Like</span>
-              </button>
+              {/* Post Actions */}
+              <div className="mt-3 pt-3 border-t border-gray-100 flex justify-between">
+                <button
+                  onClick={() => {}}
+                  className={`flex items-center text-gray-500 hover:text-red-500`}
+                >
+                  <Heart size={18} fill={"currentColor"} className="mr-1" />
+                  <span className="text-sm">Like</span>
+                </button>
 
-              <button className="flex items-center text-gray-500 hover:text-green-500">
-                <Repeat2 size={18} className="mr-1" />
-                <span className="text-sm">Repost</span>
-              </button>
+                <button className="flex items-center text-gray-500 hover:text-green-500">
+                  <Repeat2 size={18} className="mr-1" />
+                  <span className="text-sm">Repost</span>
+                </button>
 
-              <button
-                onClick={() => toggleComments(post.postId)}
-                className="flex items-center text-gray-500 hover:text-blue-500"
-              >
-                <MessageSquare size={18} className="mr-1" />
-                <span className="text-sm">Comment</span>
-              </button>
+                <button
+                  onClick={() => {}}
+                  className="flex items-center text-gray-500 hover:text-blue-500"
+                >
+                  <MessageSquare size={18} className="mr-1" />
+                  <span className="text-sm">Comment</span>
+                </button>
 
-              <button className="flex items-center text-gray-500 hover:text-purple-500">
-                <Share2 size={18} className="mr-1" />
-                <span className="text-sm">Share</span>
-              </button>
-            </div>
-
-            {/* Comment Section */}
-            {post.commentOpen && (
-              <div className="mt-4 pt-3 border-t border-gray-100">
-                {/* Existing Comments */}
-                {post.comments.length > 0 && (
-                  <div className="mb-4 space-y-3">
-                    {post.comments.map((comment) => (
-                      <div
-                        key={comment.id}
-                        className="bg-gray-50 p-3 rounded-lg"
-                      >
-                        <div className="flex justify-between">
-                          <span className="font-medium">{comment.author}</span>
-                          <span className="text-xs text-gray-500">
-                            {comment.timestamp}
-                          </span>
-                        </div>
-                        <p className="mt-1 text-sm">{comment.content}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Comment Editor */}
-                <div className="mt-2">
-                  <textarea
-                    placeholder="Write a comment..."
-                    value={commentText[post.postId] || ""}
-                    onChange={(e) =>
-                      handleCommentChange(post.postId, e.target.value)
-                    }
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                    rows={2}
-                  />
-                  <div className="mt-2 flex justify-end">
-                    <button
-                      onClick={() => submitComment(post.postId)}
-                      className="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
-                    >
-                      Comment
-                    </button>
-                  </div>
-                </div>
+                <button className="flex items-center text-gray-500 hover:text-purple-500">
+                  <Share2 size={18} className="mr-1" />
+                  <span className="text-sm">Share</span>
+                </button>
               </div>
-            )}
+
+              {/* Comment Section */}
+              {post.commentOpen && (
+                <div className="mt-4 pt-3 border-t border-gray-100">
+                  {/* Existing Comments */}
+                  {post.comments.length > 0 && (
+                    <div className="mb-4 space-y-3">
+                      {post.comments.map((comment) => (
+                        <div
+                          key={comment.id}
+                          className="bg-gray-50 p-3 rounded-lg"
+                        >
+                          <div className="flex justify-between">
+                            <span className="font-medium">
+                              {comment.author}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              {comment.timestamp}
+                            </span>
+                          </div>
+                          <p className="mt-1 text-sm">{comment.content}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ))
+        ) : (
+          <div className="text-lg italic font-semibold text-slate-500">
+            This user has no posts yet.
           </div>
-        ))}
-        : (
-        <div className="text-lg italic font-semibold text-slate-500">
-          This user has no posts yet.
-        </div>
-        )
+        )}
       </div>
     </div>
   );

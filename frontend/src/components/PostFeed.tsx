@@ -1,7 +1,12 @@
 import { PostFeedProps } from "../types";
 import { PostCard } from "./PostCard";
 
-export const PostFeed = ({ posts, isLoading, error }: PostFeedProps) => {
+export const PostFeed = ({
+  posts,
+  isLoading,
+  error,
+  viewMode,
+}: PostFeedProps) => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -18,10 +23,18 @@ export const PostFeed = ({ posts, isLoading, error }: PostFeedProps) => {
     );
   }
 
-  if (posts.length === 0) {
+  if (posts.length === 0 && viewMode === "recent") {
     return (
       <div className="text-center text-gray-600 p-8">
         No posts right now! Be the first to share your research.
+      </div>
+    );
+  }
+
+  if (posts.length === 0 && viewMode === "following") {
+    return (
+      <div className="text-center text-gray-600 p-8">
+        No posts right now! Follow other profiles to see their updates.
       </div>
     );
   }

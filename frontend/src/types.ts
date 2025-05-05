@@ -57,6 +57,11 @@ export interface PostFeedProps {
   posts: Post[];
   isLoading: boolean;
   error?: string;
+  viewMode: string;
+}
+
+export interface FollowStatusResponse {
+  isFollowing: boolean;
 }
 
 export interface PostCardProps {
